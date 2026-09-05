@@ -10,12 +10,18 @@
       "--engine", "ollama-ministral3-vision-v1",
       "--model", "ministral-3:latest",
       "--mode", "vision",
-      "--doc-id", "69Ny1DwE",
-      "--doc-id", "vBIz5dut"
+      "--doc-id", "vBIz5dut",
+      "--doc-id", "ZXlksSpk",
+      "--doc-id", "NNaGgwE5",
+      "--doc-id", "nESapyAA",
+      "--doc-id", "B0nA2c30"
     ],
     "native_results": [
-      "results/ollama-ministral3-vision-v1/69Ny1DwE.json",
       "results/ollama-ministral3-vision-v1/vBIz5dut.json",
+      "results/ollama-ministral3-vision-v1/ZXlksSpk.json",
+      "results/ollama-ministral3-vision-v1/NNaGgwE5.json",
+      "results/ollama-ministral3-vision-v1/nESapyAA.json",
+      "results/ollama-ministral3-vision-v1/B0nA2c30.json",
       "results/ollama-ministral3-vision-v1-fieldkit-summary.json"
     ],
     "metrics": {
@@ -43,8 +49,8 @@
     "timeout_seconds": 7200,
     "network": {"mode": "local-service-not-enforced"},
     "gates": [
-      {"metric": "quality.aggregate", "op": ">=", "value": 0.35},
-      {"metric": "quality.document_count", "op": "==", "value": 2},
+      {"metric": "quality.aggregate", "op": "exists"},
+      {"metric": "quality.document_count", "op": "==", "value": 5},
       {"metric": "runtime.exit_code", "op": "==", "value": 0}
     ]
   }

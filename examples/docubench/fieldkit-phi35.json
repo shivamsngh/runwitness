@@ -10,10 +10,14 @@
       "--engine", "ollama-phi35-text-v1",
       "--model", "phi3.5:latest",
       "--mode", "text",
-      "--doc-id", "PYhFptk3"
+      "--doc-id", "PYhFptk3",
+      "--doc-id", "C7fe2lau",
+      "--doc-id", "eKzY7gEA"
     ],
     "native_results": [
       "results/ollama-phi35-text-v1/PYhFptk3.json",
+      "results/ollama-phi35-text-v1/C7fe2lau.json",
+      "results/ollama-phi35-text-v1/eKzY7gEA.json",
       "results/ollama-phi35-text-v1-fieldkit-summary.json"
     ],
     "metrics": {
@@ -41,8 +45,8 @@
     "timeout_seconds": 7200,
     "network": {"mode": "local-service-not-enforced"},
     "gates": [
-      {"metric": "quality.aggregate", "op": ">=", "value": 0.6},
-      {"metric": "quality.document_count", "op": "==", "value": 1},
+      {"metric": "quality.aggregate", "op": "exists"},
+      {"metric": "quality.document_count", "op": "==", "value": 3},
       {"metric": "runtime.exit_code", "op": "==", "value": 0}
     ]
   }

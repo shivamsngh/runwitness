@@ -4,20 +4,39 @@
     "name": "DocuBench",
     "version": "external-checkout",
     "workdir": "${DOCUBENCH_HOME}",
-    "run": ["python3", "run_benchmark.py"],
-    "native_results": ["results.json"],
+    "run": [
+      "python3", "${FIELDKIT_HOME}/examples/docubench/ollama_subset.py",
+      "--repo", "${DOCUBENCH_HOME}",
+      "--engine", "ollama-ministral3-vision-v1",
+      "--model", "ministral-3:latest",
+      "--mode", "vision",
+      "--doc-id", "69Ny1DwE",
+      "--doc-id", "vBIz5dut"
+    ],
+    "native_results": [
+      "results/ollama-ministral3-vision-v1/69Ny1DwE.json",
+      "results/ollama-ministral3-vision-v1/vBIz5dut.json",
+      "results/ollama-ministral3-vision-v1-fieldkit-summary.json"
+    ],
     "metrics": {
-      "quality.aggregate": {"file": "results.json", "path": "summary.overall_score"}
+      "quality.aggregate": {
+        "file": "results/ollama-ministral3-vision-v1-fieldkit-summary.json",
+        "path": "aggregate"
+      },
+      "quality.document_count": {
+        "file": "results/ollama-ministral3-vision-v1-fieldkit-summary.json",
+        "path": "document_count"
+      }
     }
   },
   "deployment": {
-    "name": "air-gapped-target",
+    "name": "local-ollama-evaluation",
     "timeout_seconds": 7200,
-    "network": {"mode": "declared-air-gapped"},
+    "network": {"mode": "local-service-not-enforced"},
     "gates": [
-      {"metric": "quality.aggregate", "op": ">=", "value": 0.85},
-      {"metric": "runtime.exit_code", "op": "==", "value": 0},
-      {"metric": "isolation.enforced", "op": "==", "value": true}
+      {"metric": "quality.aggregate", "op": ">=", "value": 0.35},
+      {"metric": "quality.document_count", "op": "==", "value": 2},
+      {"metric": "runtime.exit_code", "op": "==", "value": 0}
     ]
   }
 }

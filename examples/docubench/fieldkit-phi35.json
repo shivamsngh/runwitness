@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.1",
+  "benchmark": {
+    "name": "DocuBench subset / Ollama Phi 3.5 text",
+    "version": "DocuBench-0.2.0",
+    "workdir": "${DOCUBENCH_HOME}",
+    "run": [
+      "python3", "${FIELDKIT_HOME}/examples/docubench/ollama_subset.py",
+      "--repo", "${DOCUBENCH_HOME}",
+      "--engine", "ollama-phi35-text-v1",
+      "--model", "phi3.5:latest",
+      "--mode", "text",
+      "--doc-id", "PYhFptk3"
+    ],
+    "native_results": [
+      "results/ollama-phi35-text-v1/PYhFptk3.json",
+      "results/ollama-phi35-text-v1-fieldkit-summary.json"
+    ],
+    "metrics": {
+      "quality.aggregate": {
+        "file": "results/ollama-phi35-text-v1-fieldkit-summary.json",
+        "path": "aggregate"
+      },
+      "quality.document_count": {
+        "file": "results/ollama-phi35-text-v1-fieldkit-summary.json",
+        "path": "document_count"
+      }
+    }
+  },
+  "deployment": {
+    "name": "local-ollama-evaluation",
+    "timeout_seconds": 7200,
+    "network": {"mode": "local-service-not-enforced"},
+    "gates": [
+      {"metric": "quality.aggregate", "op": ">=", "value": 0.6},
+      {"metric": "quality.document_count", "op": "==", "value": 1},
+      {"metric": "runtime.exit_code", "op": "==", "value": 0}
+    ]
+  }
+}

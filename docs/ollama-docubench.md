@@ -25,6 +25,12 @@ non-image formats still need deterministic conversion. Do not compare a
 text-only Phi pipeline with a vision system as though only the language models
 differed.
 
+On the initial local validation machine, `ministral-3:latest` is vision-capable
+and `phi3.5:latest` is text-only. FieldKit therefore includes two adapters:
+
+- `examples/docubench/fieldkit.json` — Ministral-3 vision subset;
+- `examples/docubench/fieldkit-phi35.json` — Phi 3.5 native-text subset.
+
 ## Environment setup
 
 Keep FieldKit and DocuBench in separate environments:
@@ -47,8 +53,9 @@ Confirm the local service and model separately:
 
 ```bash
 ollama serve
-ollama pull phi
-ollama run phi "Return only JSON: {\"ready\": true}"
+ollama pull ministral-3
+ollama pull phi3.5
+ollama run ministral-3 "Return only JSON: {\"ready\": true}"
 ```
 
 ## Runner contract
@@ -91,6 +98,21 @@ It can then map DocuBench's actual aggregate field from `results/summary.json`
 to `quality.aggregate`, alongside gates such as runtime, memory, result
 completeness, and isolation evidence. The final metric path must be confirmed
 against the installed DocuBench version instead of being assumed.
+
+Run the supplied adapters after exporting both checkout paths:
+
+```bash
+export FIELDKIT_HOME=/Users/shivam.singh/Documents/FieldKit
+export DOCUBENCH_HOME=/Users/shivam.singh/Documents/DocuBench
+
+cd "$FIELDKIT_HOME"
+source .venv/bin/activate
+python3 -m fieldkit run examples/docubench/fieldkit.json --output runs/ministral-subset
+python3 -m fieldkit run examples/docubench/fieldkit-phi35.json --output runs/phi35-subset
+```
+
+Each output directory is immutable per run; choose a new output name when
+repeating an evaluation.
 
 ## What a passing run means
 

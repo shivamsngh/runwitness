@@ -31,6 +31,8 @@ FieldKit v0.1 captures benchmark outputs, runtime evidence, host context, integr
 Requires Python 3.9 or newer and no runtime dependencies.
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 python3 -m pip install -e .
 python3 -m fieldkit validate examples/fixture_benchmark/fieldkit.json
 python3 -m fieldkit run examples/fixture_benchmark/fieldkit.json --output runs/fixture-001
@@ -57,6 +59,10 @@ a shell. Result paths must remain inside the benchmark working directory.
 
 See [`docs/adapter-contract.md`](docs/adapter-contract.md) and the runnable
 [`examples/fixture_benchmark/fieldkit.json`](examples/fixture_benchmark/fieldkit.json).
+
+To evaluate a local Ollama model with DocuBench, see
+[`docs/ollama-docubench.md`](docs/ollama-docubench.md). That workflow keeps
+DocuBench, the model runner, and FieldKit as three separate layers.
 
 ## DocuBench boundary
 

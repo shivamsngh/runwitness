@@ -50,6 +50,23 @@ def model_identity(base_url, model):
     }
 
 
+def runtime_identity(base_url, model):
+    try:
+        running = api(base_url, "/api/ps").get("models", [])
+    except RuntimeError as exc:
+        return {"source": "ollama_api_ps_after_request", "unavailable": str(exc),
+                "scope": "Ollama runtime allocation unavailable"}
+    item = next((entry for entry in running if entry.get("name") == model), {})
+    return {
+        "size_bytes": item.get("size"),
+        "vram_bytes": item.get("size_vram"),
+        "context_length": item.get("context_length"),
+        "expires_at": item.get("expires_at"),
+        "source": "ollama_api_ps_after_request",
+        "scope": "Ollama-reported loaded model allocation; not host peak RSS",
+    }
+
+
 def document_for(repo, doc_id):
     matches = list((repo / "documents").glob(doc_id + ".*"))
     if len(matches) != 1:
@@ -130,6 +147,7 @@ def run_model(repo, base_url, model, mode, doc_id, max_pages, identity):
         "prompt_sha256": prompt_hash, "temperature": 0, "num_predict": 8192,
         "response_chars": len(content),
         "response_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest() if content else None,
+        "ollama_runtime": runtime_identity(base_url, model) if response else None,
         "total_duration_ns": response.get("total_duration"),
         "load_duration_ns": response.get("load_duration"),
         "prompt_eval_count": response.get("prompt_eval_count"),
@@ -183,8 +201,19 @@ def main(argv=None):
                          "time_sec": result["time_sec"], "result": str(result_path.relative_to(repo))})
         print(json.dumps(outcomes[-1]), flush=True)
     aggregate = sum(item["score"] for item in outcomes) / len(outcomes)
+    model_allocations = []
+    for item in outcomes:
+        result = read_json(repo / item["result"])
+        runtime = result.get("meta", {}).get("ollama_runtime") or {}
+        if runtime:
+            model_allocations.append(runtime)
     summary = {"engine": args.engine, "model": identity, "mode": args.mode,
-               "document_count": len(outcomes), "aggregate": aggregate, "documents": outcomes}
+               "document_count": len(outcomes), "aggregate": aggregate, "documents": outcomes,
+               "resources": {
+                   "ollama_loaded_size_bytes": max((x.get("size_bytes") or 0 for x in model_allocations), default=None),
+                   "ollama_vram_bytes": max((x.get("vram_bytes") or 0 for x in model_allocations), default=None),
+                   "scope": "Ollama API model allocation; adapter process RSS is recorded separately by FieldKit"
+               }}
     write_json(repo / "results" / f"{args.engine}-fieldkit-summary.json", summary)
     return 0 if all(item["status"] == "ok" for item in outcomes) else 2
 

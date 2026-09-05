@@ -31,6 +31,12 @@ and `phi3.5:latest` is text-only. FieldKit therefore includes two adapters:
 - `examples/docubench/fieldkit.json` — Ministral-3 vision subset;
 - `examples/docubench/fieldkit-phi35.json` — Phi 3.5 native-text subset.
 
+`examples/docubench/starter-suite.json` names eight documents selected from the
+unchanged 72-document DocuBench corpus. It covers a photographed receipt, a PDF
+table, handwriting, Hebrew RTL, a rotated PNG, EDI text, XML, and HTML. This is
+a fast integration profile; published comparisons must use the complete corpus
+or clearly state that they are subset results.
+
 ## Environment setup
 
 Keep FieldKit and DocuBench in separate environments:
@@ -113,6 +119,14 @@ python3 -m fieldkit run examples/docubench/fieldkit-phi35.json --output runs/phi
 
 Each output directory is immutable per run; choose a new output name when
 repeating an evaluation.
+
+## Resource evidence scope
+
+FieldKit's generic runner measures its root adapter process. Ollama is a
+separately running service, so the adapter also queries Ollama after inference
+and records its reported loaded model size and VRAM allocation. The two scopes
+remain separate. Neither is described as whole-machine peak memory; a system
+collector for that stronger claim remains on the roadmap.
 
 ## What a passing run means
 

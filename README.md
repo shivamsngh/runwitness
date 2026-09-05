@@ -15,7 +15,7 @@ the benchmark while packaging them into one reviewable run record.
 
 ## Current status
 
-This is a private v0.1 prototype. It provides:
+Version 0.1.0 is a working reference implementation. It provides:
 
 - a benchmark-agnostic command adapter;
 - JSON metric mapping from native benchmark results;
@@ -23,8 +23,18 @@ This is a private v0.1 prototype. It provides:
 - `pass`, `fail`, `unknown`, and `invalid` gate decisions;
 - SHA-256 integrity records and a self-contained HTML report;
 - a runnable fixture and a DocuBench integration template.
+- local Ollama reference adapters and a named DocuBench starter smoke profile.
 
 FieldKit v0.1 captures benchmark outputs, runtime evidence, host context, integrity hashes, and policy decisions. Deeper assurance capabilities—including process-tree and GPU telemetry, enforced network isolation, network-attempt observation, signed attestations, and independent air-gap verification—are planned for subsequent releases.
+
+Resource claims are explicitly scoped. FieldKit measures the adapter root
+process directly. The Ollama adapter separately records Ollama-reported loaded
+model and VRAM allocation through its local API; that is not presented as host
+peak RSS or whole-system energy consumption.
+
+If direct root-process sampling is unavailable, FieldKit labels and uses the
+operating system's completed-child high-water mark as a fallback instead of
+silently reporting zero usage.
 
 ## Quick start
 
@@ -63,6 +73,10 @@ See [`docs/adapter-contract.md`](docs/adapter-contract.md) and the runnable
 To evaluate a local Ollama model with DocuBench, see
 [`docs/ollama-docubench.md`](docs/ollama-docubench.md). That workflow keeps
 DocuBench, the model runner, and FieldKit as three separate layers.
+
+The starter profile selects eight cases from DocuBench's existing 72-document
+corpus. It provides quick integration coverage and does not replace the complete
+authoritative benchmark.
 
 ## DocuBench boundary
 

@@ -24,11 +24,20 @@
       "quality.document_count": {
         "file": "results/ollama-phi35-text-v1-fieldkit-summary.json",
         "path": "document_count"
+      },
+      "resources.ollama_vram_bytes": {
+        "file": "results/ollama-phi35-text-v1-fieldkit-summary.json",
+        "path": "resources.ollama_vram_bytes"
       }
     }
   },
   "deployment": {
     "name": "local-ollama-evaluation",
+    "policy": {
+      "name": "docubench-starter-smoke-v0.1",
+      "status": "example-not-production",
+      "rationale": "Exercises integration behavior; thresholds are not production recommendations."
+    },
     "timeout_seconds": 7200,
     "network": {"mode": "local-service-not-enforced"},
     "gates": [

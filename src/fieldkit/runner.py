@@ -1,5 +1,6 @@
 import json
 import os
+import platform
 import shutil
 import subprocess
 import threading
@@ -44,6 +45,16 @@ def _rss_kb(pid):
         return 0
 
 
+def _child_high_water_mb():
+    try:
+        import resource
+        value = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
+        divisor = 1048576 if platform.system() == "Darwin" else 1024
+        return round(value / divisor, 3)
+    except (ImportError, ValueError):
+        return None
+
+
 def _execute(argv, cwd, timeout, stdout_path, stderr_path):
     peak = {"kb": 0}
     started = time.monotonic()
@@ -68,9 +79,14 @@ def _execute(argv, cwd, timeout, stdout_path, stderr_path):
         finally:
             stop.set()
             watcher.join(timeout=1)
+    observed_mb = round(peak["kb"] / 1024, 3) if peak["kb"] else None
+    source = "pid polling via ps"
+    if observed_mb is None:
+        observed_mb = _child_high_water_mb()
+        source = "OS completed-child high-water mark fallback" if observed_mb is not None else "unavailable"
     return {"argv": argv, "exit_code": exit_code, "timed_out": timed_out,
             "wall_seconds": round(time.monotonic() - started, 4),
-            "peak_rss_mb": round(peak["kb"] / 1024, 3)}
+            "peak_rss_mb": observed_mb, "memory_measurement_source": source}
 
 
 def _safe_source(workdir, relative):
@@ -138,8 +154,10 @@ def run(config, config_path, output_dir):
         "benchmark": {"name": benchmark["name"], "version": benchmark.get("version"),
                       "workdir": str(workdir), "venv": benchmark.get("venv"),
                       "native_results": copied},
-        "deployment": {"name": deployment.get("name", "unnamed"), "network": isolation},
-        "host": host_evidence(), "validation": validation, "execution": execution,
+        "deployment": {"name": deployment.get("name", "unnamed"),
+                       "policy": deployment.get("policy"), "network": isolation},
+        "host": host_evidence(), "validation": validation,
+        "execution": {**execution, "resource_scope": "adapter root process only; external runtimes require adapter-native evidence"},
         "metrics": metrics, "metric_mapping_errors": mapping_errors,
         "config": {"path": str(config_path), "sha256": sha256(config_path)},
     }

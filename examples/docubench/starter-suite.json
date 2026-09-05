@@ -1,0 +1,15 @@
+{
+  "name": "fieldkit-docubench-starter-v0.1",
+  "status": "smoke-profile-not-authoritative-benchmark",
+  "authoritative_suite": "All 72 documents in the external DocuBench checkout",
+  "documents": [
+    {"doc_id": "vBIz5dut", "track": "vision", "coverage": "photographed receipt and line-item array"},
+    {"doc_id": "ZXlksSpk", "track": "vision", "coverage": "PDF summary table and reconciled total"},
+    {"doc_id": "NNaGgwE5", "track": "vision", "coverage": "two-page handwritten form"},
+    {"doc_id": "nESapyAA", "track": "vision", "coverage": "Hebrew right-to-left invoice"},
+    {"doc_id": "B0nA2c30", "track": "vision", "coverage": "rotated receipt PNG"},
+    {"doc_id": "PYhFptk3", "track": "text", "coverage": "native-text EDI purchase order"},
+    {"doc_id": "C7fe2lau", "track": "text", "coverage": "XML invoice"},
+    {"doc_id": "eKzY7gEA", "track": "text", "coverage": "HTML clinical lists"}
+  ]
+}

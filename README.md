@@ -32,9 +32,12 @@ Requires Python 3.9 or newer and no runtime dependencies.
 
 ```bash
 python3 -m pip install -e .
-fieldkit validate examples/fixture_benchmark/fieldkit.json
-fieldkit run examples/fixture_benchmark/fieldkit.json --output runs/fixture-001
+python3 -m fieldkit validate examples/fixture_benchmark/fieldkit.json
+python3 -m fieldkit run examples/fixture_benchmark/fieldkit.json --output runs/fixture-001
 ```
+
+Using `python3 -m fieldkit` is recommended because it works even when the Python
+user scripts directory is not present on the shell's `PATH`.
 
 Open `runs/fixture-001/report.html`. The bundle also contains the benchmark's
 native result, stdout/stderr, evidence records, `manifest.json`, and

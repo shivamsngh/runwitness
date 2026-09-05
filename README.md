@@ -24,9 +24,7 @@ This is a private v0.1 prototype. It provides:
 - SHA-256 integrity records and a self-contained HTML report;
 - a runnable fixture and a DocuBench integration template.
 
-FieldKit does not presently inspect child-process memory, observe every network
-attempt, sign attestations, or prove that a declared air gap exists. Its evidence
-states those limits rather than converting an unverified declaration into a claim.
+FieldKit v0.1 captures benchmark outputs, runtime evidence, host context, integrity hashes, and policy decisions. Deeper assurance capabilities—including process-tree and GPU telemetry, enforced network isolation, network-attempt observation, signed attestations, and independent air-gap verification—are planned for subsequent releases.
 
 ## Quick start
 
@@ -41,6 +39,12 @@ fieldkit run examples/fixture_benchmark/fieldkit.json --output runs/fixture-001
 Open `runs/fixture-001/report.html`. The bundle also contains the benchmark's
 native result, stdout/stderr, evidence records, `manifest.json`, and
 `decision.json`.
+
+FieldKit itself can be installed in a virtual environment. A benchmark may also
+declare its own environment with `"venv": ".venv"`. When its command begins
+with `python` or `python3`, FieldKit uses that environment's interpreter and
+records the resolved environment path in the manifest. The benchmark process is
+still the measured process; activating a shell environment is unnecessary.
 
 ## Adapter contract
 
@@ -59,6 +63,14 @@ datasets, labels, schemas, or scoring logic. The exact command, result filename,
 and metric path must be aligned to the version installed by the operator.
 
 FieldKit is not affiliated with DocuPipe or DocuBench.
+
+## Roadmap
+
+- Process-tree, container, and GPU telemetry
+- OS-level network isolation and observation
+- Cryptographically signed evidence bundles
+- Independent offline verification
+- Kubernetes and private-cloud collectors
 
 ## License
 

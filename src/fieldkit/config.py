@@ -20,6 +20,14 @@ def load_config(path):
     if not workdir.is_absolute():
         workdir = source.parent / workdir
     benchmark["workdir"] = str(workdir.resolve())
+    if benchmark.get("venv"):
+        venv = Path(os.path.expandvars(benchmark["venv"])).expanduser()
+        if not venv.is_absolute():
+            venv = workdir / venv
+        benchmark["venv"] = str(venv.resolve())
+    for key in ("validate", "run"):
+        if key in benchmark:
+            benchmark[key] = [os.path.expandvars(part) for part in benchmark[key]]
     return data, source
 
 

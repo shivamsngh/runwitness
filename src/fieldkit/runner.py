@@ -14,6 +14,23 @@ from .metrics import extract_metrics
 from .report import render_report
 
 
+def _venv_python(venv):
+    unix = Path(venv) / "bin" / "python"
+    windows = Path(venv) / "Scripts" / "python.exe"
+    return unix if unix.is_file() else windows
+
+
+def _command(argv, benchmark):
+    command = list(argv)
+    venv = benchmark.get("venv")
+    if venv and Path(command[0]).name in {"python", "python3", "python.exe"}:
+        interpreter = _venv_python(venv)
+        if not interpreter.is_file():
+            raise ValueError(f"virtual environment has no Python interpreter: {venv}")
+        command[0] = str(interpreter)
+    return command
+
+
 def _write_json(path, value):
     Path(path).write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
@@ -80,14 +97,14 @@ def run(config, config_path, output_dir):
     disk_before = directory_bytes(workdir)
     validation = None
     if benchmark.get("validate"):
-        validation = _execute(benchmark["validate"], workdir, timeout,
+        validation = _execute(_command(benchmark["validate"], benchmark), workdir, timeout,
                               logs / "validate.stdout.txt", logs / "validate.stderr.txt")
     if validation and (validation["exit_code"] != 0 or validation["timed_out"]):
         execution = {"argv": benchmark["run"], "exit_code": None, "timed_out": False,
                      "wall_seconds": 0, "peak_rss_mb": 0, "skipped": "validation failed"}
     else:
         prefix = deployment.get("execution", {}).get("command_prefix", [])
-        execution = _execute(prefix + benchmark["run"], workdir, timeout,
+        execution = _execute(prefix + _command(benchmark["run"], benchmark), workdir, timeout,
                              logs / "run.stdout.txt", logs / "run.stderr.txt")
     disk_after = directory_bytes(workdir)
     copied = []
@@ -119,7 +136,8 @@ def run(config, config_path, output_dir):
         "schema_version": "0.1", "run_id": run_id,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "benchmark": {"name": benchmark["name"], "version": benchmark.get("version"),
-                      "workdir": str(workdir), "native_results": copied},
+                      "workdir": str(workdir), "venv": benchmark.get("venv"),
+                      "native_results": copied},
         "deployment": {"name": deployment.get("name", "unnamed"), "network": isolation},
         "host": host_evidence(), "validation": validation, "execution": execution,
         "metrics": metrics, "metric_mapping_errors": mapping_errors,

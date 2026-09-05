@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import sys
 import tempfile
@@ -11,7 +12,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from fieldkit.config import ConfigError, load_config, validate_config
 from fieldkit.gates import evaluate
 from fieldkit.metrics import extract_metrics
-from fieldkit.runner import run
+from fieldkit.runner import _command, run
 
 
 class FieldKitTests(unittest.TestCase):
@@ -26,6 +27,15 @@ class FieldKitTests(unittest.TestCase):
             values, errors = extract_metrics({"quality": {"file": "result.json", "path": "summary.score"}}, folder)
             self.assertEqual(values["quality"], 0.91)
             self.assertEqual(errors, {})
+
+    def test_benchmark_virtual_environment(self):
+        with tempfile.TemporaryDirectory() as folder:
+            interpreter = Path(folder) / "bin" / "python"
+            interpreter.parent.mkdir()
+            os.symlink(sys.executable, interpreter)
+            resolved = _command(["python3", "benchmark.py"], {"venv": folder})
+            self.assertEqual(Path(resolved[0]).resolve(), Path(sys.executable).resolve())
+            self.assertEqual(resolved[1], "benchmark.py")
 
     def test_gate_states(self):
         self.assertEqual(evaluate([{"metric": "x", "op": ">=", "value": 1}], {"x": 2})["overall"], "pass")

@@ -7,6 +7,8 @@ The benchmark section declares:
 - `name` and optional `version`;
 - `workdir`, relative to the configuration file or supplied through an
   environment variable;
+- optional `venv`, resolved relative to `workdir`; it replaces a leading
+  `python` or `python3` command with that environment's interpreter;
 - optional `validate` and required `run` argv arrays;
 - `native_results`, copied unchanged into the evidence bundle;
 - `metrics`, mapping FieldKit metric names to a native JSON file and dot path.

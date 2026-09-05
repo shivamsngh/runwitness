@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1",
+  "benchmark": {
+    "name": "DocuBench",
+    "version": "external-checkout",
+    "workdir": "${DOCUBENCH_HOME}",
+    "run": ["python3", "run_benchmark.py"],
+    "native_results": ["results.json"],
+    "metrics": {
+      "quality.aggregate": {"file": "results.json", "path": "summary.overall_score"}
+    }
+  },
+  "deployment": {
+    "name": "air-gapped-target",
+    "timeout_seconds": 7200,
+    "network": {"mode": "declared-air-gapped"},
+    "gates": [
+      {"metric": "quality.aggregate", "op": ">=", "value": 0.85},
+      {"metric": "runtime.exit_code", "op": "==", "value": 0},
+      {"metric": "isolation.enforced", "op": "==", "value": true}
+    ]
+  }
+}

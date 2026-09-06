@@ -1,0 +1,6 @@
+* @shivamsngh
+
+# Changes here can alter CI permissions or publish packages.
+/.github/workflows/ @shivamsngh
+/pyproject.toml @shivamsngh
+/collector/Cargo.toml @shivamsngh

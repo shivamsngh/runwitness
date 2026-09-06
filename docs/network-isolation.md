@@ -20,6 +20,6 @@ Successful evidence proves that the benchmark process started after entering a n
 
 Linux ordinarily requires `CAP_SYS_ADMIN` for `CLONE_NEWNET`. Run RunWitness through an appropriately constrained container or service account; do not grant broader host privileges solely for convenience.
 
-The continuous-integration release gate exercises the successful Linux path inside an ephemeral privileged test container where namespace creation is intentionally permitted. It first confirms that the parent namespace has an `eth0` device, then confirms the benchmark cannot see that device after RunWitness creates the new namespace, and validates the resulting enforcement fields. This is an implementation regression test, not product guidance and not proof about a user's deployment environment.
+The continuous-integration release gate exercises the successful Linux path inside an ephemeral privileged test container where namespace creation is intentionally permitted. It first confirms that the parent namespace reports an `eth0` interface through `/proc/net/dev`, then confirms the benchmark cannot see that interface after RunWitness creates the new namespace, and validates the resulting enforcement fields. This is an implementation regression test, not product guidance and not proof about a user's deployment environment.
 
 The kernel behavior and privilege requirement are documented in [`unshare(2)`](https://man7.org/linux/man-pages/man2/unshare.2.html) and [`network_namespaces(7)`](https://man7.org/linux/man-pages/man7/network_namespaces.7.html).

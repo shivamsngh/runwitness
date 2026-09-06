@@ -39,12 +39,12 @@ jobs:
             -w /work \
             ubuntu:24.04 \
             /bin/sh -c '
-              test -e /sys/class/net/eth0 &&
+              grep -q "eth0:" /proc/net/dev &&
               ./collector/target/debug/runwitness-collector \
                 run \
                 --output /work/collector/target/network-isolation-evidence.json \
                 --network-deny \
-                -- /bin/sh -c "test ! -e /sys/class/net/eth0"
+                -- /bin/sh -c "! grep -q eth0: /proc/net/dev"
             '
 
           python - <<'PY'

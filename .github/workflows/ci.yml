@@ -30,6 +30,39 @@ jobs:
           components: clippy,rustfmt
       - run: cargo fmt --manifest-path collector/Cargo.toml -- --check
       - run: cargo clippy --manifest-path collector/Cargo.toml --all-targets -- -D warnings
+      - run: cargo build --manifest-path collector/Cargo.toml
+      - name: Verify Linux network namespace enforcement
+        run: |
+          docker run --rm \
+            --cap-add SYS_ADMIN \
+            --security-opt apparmor=unconfined \
+            ubuntu:24.04 \
+            /bin/sh -c 'test -e /sys/class/net/eth0'
+
+          docker run --rm \
+            --cap-add SYS_ADMIN \
+            --security-opt apparmor=unconfined \
+            -v "$PWD:/work" \
+            -w /work \
+            ubuntu:24.04 \
+            ./collector/target/debug/runwitness-collector \
+              run \
+              --output /work/collector/target/network-isolation-evidence.json \
+              --network-deny \
+              -- /bin/sh -c 'test ! -e /sys/class/net/eth0'
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          evidence = json.loads(
+              Path("collector/target/network-isolation-evidence.json").read_text()
+          )
+          assert evidence["status"] == "complete"
+          assert evidence["network"]["requested_mode"] == "deny"
+          assert evidence["network"]["enforced"] is True
+          assert evidence["network"]["mechanism"] == "linux_network_namespace"
+          assert evidence["network"]["attempt_observation"] == "unavailable"
+          PY
       - run: cargo test --manifest-path collector/Cargo.toml
       - run: cargo publish --manifest-path collector/Cargo.toml --dry-run
-

@@ -89,6 +89,14 @@ def _execute(argv, cwd, timeout, stdout_path, stderr_path):
             "peak_rss_mb": observed_mb, "memory_measurement_source": source}
 
 
+def _collector_command(command, deployment, evidence_path):
+    collector = deployment.get("collector")
+    if not collector:
+        return command
+    return (list(collector["command"]) + ["run", "--output", str(evidence_path),
+            "--sample-interval-ms", str(collector.get("sample_interval_ms", 100)), "--"] + command)
+
+
 def _safe_source(workdir, relative):
     root = Path(workdir).resolve()
     source = (root / relative).resolve()
@@ -120,7 +128,9 @@ def run(config, config_path, output_dir):
                      "wall_seconds": 0, "peak_rss_mb": 0, "skipped": "validation failed"}
     else:
         prefix = deployment.get("execution", {}).get("command_prefix", [])
-        execution = _execute(prefix + _command(benchmark["run"], benchmark), workdir, timeout,
+        benchmark_command = prefix + _command(benchmark["run"], benchmark)
+        wrapped_command = _collector_command(benchmark_command, deployment, evidence_dir / "system.json")
+        execution = _execute(wrapped_command, workdir, timeout,
                              logs / "run.stdout.txt", logs / "run.stderr.txt")
     disk_after = directory_bytes(workdir)
     copied = []
@@ -146,6 +156,16 @@ def run(config, config_path, output_dir):
                     "resources.peak_rss_mb": execution["peak_rss_mb"],
                     "resources.workdir_delta_mb": round((disk_after - disk_before) / 1048576, 3),
                     "isolation.enforced": isolation["enforced"]})
+    system_evidence = None
+    system_evidence_path = evidence_dir / "system.json"
+    if deployment.get("collector") and system_evidence_path.is_file():
+        try:
+            system_evidence = json.loads(system_evidence_path.read_text(encoding="utf-8"))
+            system_evidence["artifact"] = {"path": "evidence/system.json", "sha256": sha256(system_evidence_path)}
+            metrics["resources.process_tree_peak_rss_mb"] = round(system_evidence["peak_tree_rss_bytes"] / 1048576, 3)
+            metrics["resources.process_tree_peak_count"] = system_evidence["peak_process_count"]
+        except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError):
+            system_evidence = {"status": "invalid", "note": "collector evidence could not be parsed"}
     run_valid = execution.get("exit_code") == 0 and not execution.get("timed_out")
     decision = evaluate(deployment.get("gates", []), metrics, run_valid)
     manifest = {
@@ -157,7 +177,10 @@ def run(config, config_path, output_dir):
         "deployment": {"name": deployment.get("name", "unnamed"),
                        "policy": deployment.get("policy"), "network": isolation},
         "host": host_evidence(), "validation": validation,
-        "execution": {**execution, "resource_scope": "adapter root process only; external runtimes require adapter-native evidence"},
+        "execution": {**execution, "resource_scope": ("benchmark root process and sampled descendants; external runtimes require adapter-native evidence"
+                                                        if system_evidence and system_evidence.get("status") != "invalid"
+                                                        else "adapter root process only; external runtimes require adapter-native evidence")},
+        "collector": system_evidence,
         "metrics": metrics, "metric_mapping_errors": mapping_errors,
         "config": {"path": str(config_path), "sha256": sha256(config_path)},
     }

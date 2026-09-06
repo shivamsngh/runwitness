@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "benchmark": {
+    "name": "fixture-document-benchmark",
+    "version": "1.0",
+    "workdir": ".",
+    "validate": ["python3", "benchmark.py", "--validate"],
+    "run": ["python3", "benchmark.py", "--output", "native-results.json"],
+    "native_results": ["native-results.json"],
+    "metrics": {
+      "quality.aggregate": {"file": "native-results.json", "path": "summary.accuracy"}
+    }
+  },
+  "deployment": {
+    "name": "local-process-tree-example",
+    "timeout_seconds": 30,
+    "network": {"mode": "not_enforced"},
+    "collector": {
+      "command": ["../../collector/target/release/fieldkit-collector"],
+      "sample_interval_ms": 25
+    },
+    "gates": [
+      {"metric": "quality.aggregate", "op": ">=", "value": 0.9},
+      {"metric": "runtime.wall_seconds", "op": "<=", "value": 10},
+      {"metric": "resources.process_tree_peak_rss_mb", "op": "<=", "value": 256},
+      {"metric": "resources.process_tree_peak_count", "op": "exists"}
+    ]
+  }
+}

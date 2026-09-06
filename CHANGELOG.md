@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add an optional Rust descendant-process collector that records process-tree peak RSS, peak process count, and explicit evidence boundaries.
+- Add Python orchestration and gate metrics for collector-produced `evidence/system.json`.
 - Added evidence-bundle integrity verification with `fieldkit verify`.
 - Added metric comparison with `fieldkit compare`, including comparability warnings.
 - Added a project icon, architecture visual, and evidence-backed benchmark graphic.

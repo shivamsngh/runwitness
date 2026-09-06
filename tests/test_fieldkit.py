@@ -14,9 +14,47 @@ from fieldkit.bundle import compare_bundles, verify_bundle
 from fieldkit.gates import evaluate
 from fieldkit.metrics import extract_metrics
 from fieldkit.runner import _command, run
+from fieldkit.runner import _collector_command
 
 
 class FieldKitTests(unittest.TestCase):
+    def test_collector_command_is_argv_safe(self):
+        command = ["python3", "job.py", "value with spaces"]
+        wrapped = _collector_command(command, {"collector": {"command": ["/tmp/collector"], "sample_interval_ms": 25}}, Path("system.json"))
+        self.assertEqual(wrapped, ["/tmp/collector", "run", "--output", "system.json", "--sample-interval-ms", "25", "--"] + command)
+
+    def test_config_validates_collector(self):
+        base = {"schema_version": "0.1", "benchmark": {"name": "x", "run": ["true"]},
+                "deployment": {"gates": [], "collector": {"command": ["collector"], "sample_interval_ms": 100}}}
+        validate_config(base)
+        base["deployment"]["collector"]["sample_interval_ms"] = 1
+        with self.assertRaises(ConfigError):
+            validate_config(base)
+
+    def test_collector_executable_resolves_from_config(self):
+        with tempfile.TemporaryDirectory() as folder:
+            config_file = Path(folder) / "fieldkit.json"
+            config_file.write_text(json.dumps({
+                "schema_version": "0.1", "benchmark": {"name": "x", "run": ["true"]},
+                "deployment": {"gates": [], "collector": {"command": ["./bin/collector"]}}
+            }))
+            config, _ = load_config(config_file)
+            self.assertEqual(config["deployment"]["collector"]["command"][0], str(Path(folder, "bin", "collector").resolve()))
+
+    def test_verify_detects_changed_collector_evidence(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "evidence").mkdir()
+            evidence = root / "evidence" / "system.json"
+            evidence.write_text('{"peak_process_count": 2}')
+            import hashlib
+            digest = hashlib.sha256(evidence.read_bytes()).hexdigest()
+            (root / "manifest.json").write_text(json.dumps({"collector": {"artifact": {
+                "path": "evidence/system.json", "sha256": digest}}}))
+            (root / "decision.json").write_text("{}")
+            self.assertEqual(verify_bundle(root)["overall"], "pass")
+            evidence.write_text('{"peak_process_count": 999}')
+            self.assertEqual(verify_bundle(root)["overall"], "fail")
     def test_verify_and_compare_bundles(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

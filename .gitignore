@@ -6,3 +6,4 @@ build/
 *.egg-info/
 runs/
 native-results.json
+collector/target/

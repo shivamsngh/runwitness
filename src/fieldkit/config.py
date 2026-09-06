@@ -28,6 +28,12 @@ def load_config(path):
     for key in ("validate", "run"):
         if key in benchmark:
             benchmark[key] = [os.path.expandvars(part) for part in benchmark[key]]
+    collector = data["deployment"].get("collector")
+    if collector:
+        collector["command"] = [os.path.expandvars(part) for part in collector["command"]]
+        executable = Path(collector["command"][0]).expanduser()
+        if not executable.is_absolute() and len(executable.parts) > 1:
+            collector["command"][0] = str((source.parent / executable).resolve())
     return data, source
 
 
@@ -49,6 +55,15 @@ def validate_config(data):
         raise ConfigError("benchmark.validate must be an argv array")
     if not isinstance(deployment.get("gates", []), list):
         raise ConfigError("deployment.gates must be an array")
+    collector = deployment.get("collector")
+    if collector is not None:
+        if not isinstance(collector, dict) or not isinstance(collector.get("command"), list) or not collector["command"]:
+            raise ConfigError("deployment.collector.command must be a non-empty argv array")
+        if not all(isinstance(part, str) for part in collector["command"]):
+            raise ConfigError("deployment.collector.command must contain strings")
+        interval = collector.get("sample_interval_ms", 100)
+        if not isinstance(interval, int) or interval < 10:
+            raise ConfigError("deployment.collector.sample_interval_ms must be an integer of at least 10")
     for gate in deployment.get("gates", []):
         if not isinstance(gate, dict) or not gate.get("metric") or gate.get("op") not in {
             "==", "!=", ">", ">=", "<", "<=", "exists"

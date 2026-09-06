@@ -29,6 +29,15 @@ def verify_bundle(bundle):
             status = "pass" if actual == artifact.get("sha256") else "fail"
         checks.append({"name": "native_result", "path": relative, "expected_sha256": artifact.get("sha256"),
                        "actual_sha256": actual, "status": status})
+    collector_artifact = manifest.get("collector", {}).get("artifact")
+    if collector_artifact:
+        relative = collector_artifact.get("path", "")
+        target = (root / relative).resolve()
+        safe = target == root or root in target.parents
+        actual = sha256(target) if safe and target.is_file() else None
+        checks.append({"name": "collector_evidence", "path": relative,
+                       "expected_sha256": collector_artifact.get("sha256"), "actual_sha256": actual,
+                       "status": "pass" if actual == collector_artifact.get("sha256") else "fail"})
     return {"bundle": str(root), "run_id": manifest.get("run_id"),
             "overall": "pass" if checks and all(x["status"] == "pass" for x in checks) else "fail",
             "checks": checks}

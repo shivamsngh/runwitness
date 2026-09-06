@@ -67,6 +67,21 @@ python3 -m fieldkit compare runs/baseline runs/candidate
 `verify` recalculates native-result hashes and detects missing or modified
 artifacts. `compare` produces a machine-readable metric delta across two bundles.
 
+## Process-tree evidence (v0.2 preview)
+
+FieldKit now includes an optional Rust collector that launches the benchmark and
+samples its descendant process tree. It records peak tree RSS, peak process count,
+observed process identity, collection interval, and an explicit observation scope.
+The Python runner turns those facts into gateable metrics while preserving the
+collector's original `evidence/system.json`.
+
+```bash
+cargo build --release --manifest-path collector/Cargo.toml
+```
+
+See the [collector setup and evidence boundary](docs/system-collector.md). This
+preview is additive: existing configurations continue to work without Rust.
+
 ## Adapter contract
 
 An adapter declares benchmark identity, an argv command, native result files,
@@ -90,14 +105,15 @@ See the [complete workflow](docs/ollama-docubench.md), the
 
 ## Evidence boundaries
 
-FieldKit v0.1.0 directly measures the adapter process. The Ollama adapter also
+Without the optional collector, FieldKit directly measures the adapter process.
+With it, FieldKit samples the benchmark's descendant tree. The Ollama adapter also
 records Ollama-reported model allocation and VRAM through its local API. Neither
 is presented as whole-machine peak memory. Likewise, declaring a target
 air-gapped is not treated as proof of isolation.
 
-Planned assurance work includes process-tree and GPU telemetry, OS-level network
-isolation and observation, signed attestations, independent offline verification,
-and Kubernetes/private-cloud collectors.
+Planned assurance work includes GPU telemetry, OS-level network isolation and
+observation, signed attestations, independent offline verification, and
+Kubernetes/private-cloud collectors.
 
 ## Development
 

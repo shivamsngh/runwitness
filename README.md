@@ -2,7 +2,7 @@
 <h1 align="center">RunWitness</h1>
 <p align="center"><strong>Deployment evidence around the benchmark you already trust.</strong></p>
 <p align="center">
-  <a href="https://github.com/shivamsngh/runwitness/releases/tag/v0.2.0"><img alt="Release v0.2.0" src="https://img.shields.io/badge/release-v0.2.0-21c96b"></a>
+  <a href="https://github.com/shivamsngh/runwitness/releases/tag/v0.2.1"><img alt="Release v0.2.1" src="https://img.shields.io/badge/release-v0.2.1-21c96b"></a>
   <a href="https://pypi.org/project/runwitness/"><img alt="PyPI" src="https://img.shields.io/pypi/v/runwitness?color=21c96b"></a>
   <a href="https://crates.io/crates/runwitness-collector"><img alt="crates.io" src="https://img.shields.io/crates/v/runwitness-collector?color=21c96b"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-17211c"></a>

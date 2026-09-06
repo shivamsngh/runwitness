@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.1 — 2026-09-06
 
 - Add reproducible Ministral-3 vision and Phi 3.5 text DocuBench case-study manifests and an evidence-bounded report.
 - Fix `runwitness verify` for valid bundles that omit the optional Rust collector.

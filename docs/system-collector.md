@@ -12,17 +12,17 @@ Configure it under `deployment`:
 
 ```json
 "collector": {
-  "command": ["./collector/target/release/fieldkit-collector"],
+  "command": ["./collector/target/release/runwitness-collector"],
   "sample_interval_ms": 100
 }
 ```
 
-Collector paths containing `/` are resolved relative to the FieldKit config file.
+Collector paths containing `/` are resolved relative to the RunWitness config file.
 After building, try the complete fixture:
 
 ```console
-python3 -m fieldkit run examples/fixture_benchmark/fieldkit-collector.json --output runs/collector-fixture
-python3 -m fieldkit verify runs/collector-fixture
+python3 -m runwitness run examples/fixture_benchmark/runwitness-collector.json --output runs/collector-fixture
+python3 -m runwitness verify runs/collector-fixture
 ```
 
 The evidence bundle then includes `evidence/system.json` and the metrics `resources.process_tree_peak_rss_mb` and `resources.process_tree_peak_count`.

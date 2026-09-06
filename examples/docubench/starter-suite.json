@@ -1,5 +1,5 @@
 {
-  "name": "fieldkit-docubench-starter-v0.1",
+  "name": "runwitness-docubench-starter-v0.1",
   "status": "smoke-profile-not-authoritative-benchmark",
   "authoritative_suite": "All 72 documents in the external DocuBench checkout",
   "documents": [

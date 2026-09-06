@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = ROOT / "examples" / "docubench" / "ollama_subset.py"
-SPEC = importlib.util.spec_from_file_location("fieldkit_ollama_subset", MODULE_PATH)
+SPEC = importlib.util.spec_from_file_location("runwitness_ollama_subset", MODULE_PATH)
 ADAPTER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(ADAPTER)
 

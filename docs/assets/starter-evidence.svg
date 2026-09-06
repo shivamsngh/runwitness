@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="610" viewBox="0 0 1200 610" role="img" aria-labelledby="title desc">
-  <title id="title">FieldKit starter evidence results</title>
+  <title id="title">RunWitness starter evidence results</title>
   <desc id="desc">DocuBench subset scores from local Ollama models. Ministral vision averaged 60.15 percent across five documents and Phi 3.5 text averaged 63.90 percent across three documents.</desc>
   <rect width="1200" height="610" rx="28" fill="#101512"/>
   <text x="64" y="76" fill="#f4f7f4" font-family="system-ui,sans-serif" font-size="34" font-weight="700">Evidence varies by deployment path.</text>

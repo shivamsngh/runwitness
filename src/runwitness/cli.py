@@ -9,7 +9,7 @@ from .runner import run
 
 
 def parser():
-    root = argparse.ArgumentParser(prog="fieldkit", description="Run any benchmark with deployment evidence")
+    root = argparse.ArgumentParser(prog="runwitness", description="Run any benchmark with deployment evidence")
     commands = root.add_subparsers(dest="command", required=True)
     validate = commands.add_parser("validate", help="validate an adapter and policy")
     validate.add_argument("config")
@@ -42,5 +42,5 @@ def main(argv=None):
         print(json.dumps({"bundle": str(bundle), "decision": decision["overall"]}))
         return 0 if decision["overall"] == "pass" else 2
     except (ConfigError, OSError, ValueError) as exc:
-        print(f"fieldkit: {exc}", file=sys.stderr)
+        print(f"runwitness: {exc}", file=sys.stderr)
         return 1

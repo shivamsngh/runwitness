@@ -5,7 +5,7 @@
     "version": "external-checkout",
     "workdir": "${DOCUBENCH_HOME}",
     "run": [
-      "python3", "${FIELDKIT_HOME}/examples/docubench/ollama_subset.py",
+      "python3", "${RUNWITNESS_HOME}/examples/docubench/ollama_subset.py",
       "--repo", "${DOCUBENCH_HOME}",
       "--engine", "ollama-ministral3-vision-v1",
       "--model", "ministral-3:latest",
@@ -22,19 +22,19 @@
       "results/ollama-ministral3-vision-v1/NNaGgwE5.json",
       "results/ollama-ministral3-vision-v1/nESapyAA.json",
       "results/ollama-ministral3-vision-v1/B0nA2c30.json",
-      "results/ollama-ministral3-vision-v1-fieldkit-summary.json"
+      "results/ollama-ministral3-vision-v1-runwitness-summary.json"
     ],
     "metrics": {
       "quality.aggregate": {
-        "file": "results/ollama-ministral3-vision-v1-fieldkit-summary.json",
+        "file": "results/ollama-ministral3-vision-v1-runwitness-summary.json",
         "path": "aggregate"
       },
       "quality.document_count": {
-        "file": "results/ollama-ministral3-vision-v1-fieldkit-summary.json",
+        "file": "results/ollama-ministral3-vision-v1-runwitness-summary.json",
         "path": "document_count"
       },
       "resources.ollama_vram_bytes": {
-        "file": "results/ollama-ministral3-vision-v1-fieldkit-summary.json",
+        "file": "results/ollama-ministral3-vision-v1-runwitness-summary.json",
         "path": "resources.ollama_vram_bytes"
       }
     }

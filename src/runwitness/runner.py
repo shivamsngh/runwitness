@@ -151,7 +151,7 @@ def run(config, config_path, output_dir):
         "requested_mode": network.get("mode", "not_enforced"),
         "enforced": bool(deployment.get("execution", {}).get("command_prefix")),
         "mechanism": deployment.get("execution", {}).get("mechanism"),
-        "note": "FieldKit records configured enforcement; it does not infer zero network activity."
+        "note": "RunWitness records configured enforcement; it does not infer zero network activity."
     }
     metrics = dict(mapped)
     metrics.update({"runtime.wall_seconds": execution["wall_seconds"],

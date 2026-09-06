@@ -212,9 +212,9 @@ def main(argv=None):
                "resources": {
                    "ollama_loaded_size_bytes": max((x.get("size_bytes") or 0 for x in model_allocations), default=None),
                    "ollama_vram_bytes": max((x.get("vram_bytes") or 0 for x in model_allocations), default=None),
-                   "scope": "Ollama API model allocation; adapter process RSS is recorded separately by FieldKit"
+                   "scope": "Ollama API model allocation; adapter process RSS is recorded separately by RunWitness"
                }}
-    write_json(repo / "results" / f"{args.engine}-fieldkit-summary.json", summary)
+    write_json(repo / "results" / f"{args.engine}-runwitness-summary.json", summary)
     return 0 if all(item["status"] == "ok" for item in outcomes) else 2
 
 

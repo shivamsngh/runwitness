@@ -6,10 +6,10 @@ This integration has three independent layers:
    local model, and writes one native result envelope per document.
 2. **DocuBench** validates and scores those result envelopes against its labels
    using its own scorer.
-3. **FieldKit** invokes that workflow, preserves the native results, records
+3. **RunWitness** invokes that workflow, preserves the native results, records
    deployment evidence, and evaluates deployment gates.
 
-FieldKit does not copy or modify DocuBench code, data, labels, or scoring.
+RunWitness does not copy or modify DocuBench code, data, labels, or scoring.
 
 ## Important model constraint
 
@@ -26,10 +26,10 @@ text-only Phi pipeline with a vision system as though only the language models
 differed.
 
 On the initial local validation machine, `ministral-3:latest` is vision-capable
-and `phi3.5:latest` is text-only. FieldKit therefore includes two adapters:
+and `phi3.5:latest` is text-only. RunWitness therefore includes two adapters:
 
-- `examples/docubench/fieldkit.json` — Ministral-3 vision subset;
-- `examples/docubench/fieldkit-phi35.json` — Phi 3.5 native-text subset.
+- `examples/docubench/runwitness.json` — Ministral-3 vision subset;
+- `examples/docubench/runwitness-phi35.json` — Phi 3.5 native-text subset.
 
 `examples/docubench/starter-suite.json` names eight documents selected from the
 unchanged 72-document DocuBench corpus. It covers a photographed receipt, a PDF
@@ -39,10 +39,10 @@ or clearly state that they are subset results.
 
 ## Environment setup
 
-Keep FieldKit and DocuBench in separate environments:
+Keep RunWitness and DocuBench in separate environments:
 
 ```bash
-cd /Users/shivam.singh/Documents/FieldKit
+cd /Users/shivam.singh/Documents/RunWitness
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -e .
@@ -67,7 +67,7 @@ ollama run ministral-3 "Return only JSON: {\"ready\": true}"
 ## Runner contract
 
 DocuBench does not currently ship an Ollama runner. The integration therefore
-needs a small external runner—not code inside FieldKit—that:
+needs a small external runner—not code inside RunWitness—that:
 
 - iterates over `documents/` and loads the matching `schemas/<doc_id>.json`;
 - converts each source into model-readable text or ordered page images;
@@ -90,9 +90,9 @@ docubench score --engine ollama-phi2-pymupdf-tesseract-v1
 docubench report
 ```
 
-## FieldKit adapter
+## RunWitness adapter
 
-The FieldKit adapter should execute one orchestration script that runs the
+The RunWitness adapter should execute one orchestration script that runs the
 external model runner followed by DocuBench validation, scoring, and reporting.
 It should preserve:
 
@@ -108,13 +108,13 @@ against the installed DocuBench version instead of being assumed.
 Run the supplied adapters after exporting both checkout paths:
 
 ```bash
-export FIELDKIT_HOME=/Users/shivam.singh/Documents/FieldKit
+export RUNWITNESS_HOME=/Users/shivam.singh/Documents/RunWitness
 export DOCUBENCH_HOME=/Users/shivam.singh/Documents/DocuBench
 
-cd "$FIELDKIT_HOME"
+cd "$RUNWITNESS_HOME"
 source .venv/bin/activate
-python3 -m fieldkit run examples/docubench/fieldkit.json --output runs/ministral-subset
-python3 -m fieldkit run examples/docubench/fieldkit-phi35.json --output runs/phi35-subset
+python3 -m runwitness run examples/docubench/runwitness.json --output runs/ministral-subset
+python3 -m runwitness run examples/docubench/runwitness-phi35.json --output runs/phi35-subset
 ```
 
 Each output directory is immutable per run; choose a new output name when
@@ -122,7 +122,7 @@ repeating an evaluation.
 
 ## Resource evidence scope
 
-FieldKit's generic runner measures its root adapter process. Ollama is a
+RunWitness's generic runner measures its root adapter process. Ollama is a
 separately running service, so the adapter also queries Ollama after inference
 and records its reported loaded model size and VRAM allocation. The two scopes
 remain separate. Neither is described as whole-machine peak memory; a system
@@ -132,5 +132,5 @@ collector for that stronger claim remains on the roadmap.
 
 A pass means the complete declared system—document conversion, Ollama, the
 selected model, prompt, and generation settings—met both DocuBench quality and
-FieldKit deployment gates. It does not prove an air gap unless isolation was
+RunWitness deployment gates. It does not prove an air gap unless isolation was
 independently enforced and observed during that run.

@@ -1,6 +1,6 @@
 # Adapter contract (schema 0.1)
 
-FieldKit accepts a JSON document with `benchmark` and `deployment` sections.
+RunWitness accepts a JSON document with `benchmark` and `deployment` sections.
 
 The benchmark section declares:
 
@@ -11,7 +11,7 @@ The benchmark section declares:
   `python` or `python3` command with that environment's interpreter;
 - optional `validate` and required `run` argv arrays;
 - `native_results`, copied unchanged into the evidence bundle;
-- `metrics`, mapping FieldKit metric names to a native JSON file and dot path.
+- `metrics`, mapping RunWitness metric names to a native JSON file and dot path.
 
 The deployment section declares:
 
@@ -27,8 +27,8 @@ metric is missing, and passes only when every gate passes.
 
 ## Isolation semantics
 
-`network.mode` is a declaration. FieldKit v0.1 marks `isolation.enforced` true
+`network.mode` is a declaration. RunWitness v0.1 marks `isolation.enforced` true
 only when the operator supplies a command prefix, and records that mechanism.
-This means the wrapper was configured, not that FieldKit observed zero outbound
+This means the wrapper was configured, not that RunWitness observed zero outbound
 attempts. A future collector can add OS-specific enforcement and network-event
 evidence without changing the benchmark adapter.

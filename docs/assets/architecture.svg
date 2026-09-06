@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="350" viewBox="0 0 1200 350" role="img" aria-labelledby="title desc">
-  <title id="title">FieldKit architecture</title><desc id="desc">An external benchmark and deployment policy enter FieldKit, which runs collectors and gates to produce an evidence bundle.</desc>
+  <title id="title">RunWitness architecture</title><desc id="desc">An external benchmark and deployment policy enter RunWitness, which runs collectors and gates to produce an evidence bundle.</desc>
   <rect width="1200" height="350" rx="28" fill="#f3f6f3"/>
   <g font-family="system-ui,sans-serif">
     <g fill="#fff" stroke="#1a241e" stroke-width="2"><rect x="50" y="65" width="250" height="90" rx="16"/><rect x="50" y="195" width="250" height="90" rx="16"/></g>
@@ -7,7 +7,7 @@
     <text x="175" y="235" text-anchor="middle" font-size="20" font-weight="700" fill="#111713">Deployment policy</text><text x="175" y="263" text-anchor="middle" font-size="15" fill="#566159">Explicit acceptance gates</text>
     <path d="M300 110 H405 M300 240 H405" stroke="#1a241e" stroke-width="3" marker-end="url(#arrow)"/>
     <rect x="420" y="50" width="350" height="250" rx="24" fill="#111713"/>
-    <text x="595" y="100" text-anchor="middle" font-size="30" font-weight="750" fill="#f5f8f5">FieldKit</text>
+    <text x="595" y="100" text-anchor="middle" font-size="30" font-weight="750" fill="#f5f8f5">RunWitness</text>
     <g fill="#21df73"><circle cx="485" cy="151" r="6"/><circle cx="485" cy="196" r="6"/><circle cx="485" cy="241" r="6"/></g>
     <g fill="#cad4cd" font-size="17"><text x="505" y="157">Run without shell indirection</text><text x="505" y="202">Collect scoped evidence</text><text x="505" y="247">Evaluate and explain gates</text></g>
     <path d="M770 175 H875" stroke="#1a241e" stroke-width="3" marker-end="url(#arrow)"/>

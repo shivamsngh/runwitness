@@ -74,7 +74,7 @@ struct Options {
 
 fn usage(message: &str) -> ! {
     eprintln!(
-        "{message}\nusage: fieldkit-collector run --output FILE [--sample-interval-ms N] [--network-deny] -- COMMAND [ARG ...]"
+        "{message}\nusage: runwitness-collector run --output FILE [--sample-interval-ms N] [--network-deny] -- COMMAND [ARG ...]"
     );
     std::process::exit(2);
 }
@@ -251,7 +251,7 @@ fn run(mut child: Child, options: &Options) -> Result<(Evidence, i32), String> {
                     status: "complete",
                     schema_version: "0.1",
                     collector: CollectorIdentity {
-                        name: "fieldkit-collector",
+                        name: "runwitness-collector",
                         version: env!("CARGO_PKG_VERSION"),
                     },
                     scope: Scope {
@@ -287,7 +287,7 @@ fn main() -> ExitCode {
                 schema_version: "0.1",
                 status: "invalid",
                 collector: CollectorIdentity {
-                    name: "fieldkit-collector",
+                    name: "runwitness-collector",
                     version: env!("CARGO_PKG_VERSION"),
                 },
                 error: &error.to_string(),

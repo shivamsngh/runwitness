@@ -16,7 +16,7 @@
     "timeout_seconds": 30,
     "network": {"mode": "not_enforced"},
     "collector": {
-      "command": ["../../collector/target/release/fieldkit-collector"],
+      "command": ["../../collector/target/release/runwitness-collector"],
       "sample_interval_ms": 25
     },
     "gates": [

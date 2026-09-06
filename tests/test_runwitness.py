@@ -9,15 +9,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fieldkit.config import ConfigError, load_config, validate_config
-from fieldkit.bundle import compare_bundles, verify_bundle
-from fieldkit.gates import evaluate
-from fieldkit.metrics import extract_metrics
-from fieldkit.runner import _command, run
-from fieldkit.runner import _collector_command
+from runwitness.config import ConfigError, load_config, validate_config
+from runwitness.bundle import compare_bundles, verify_bundle
+from runwitness.gates import evaluate
+from runwitness.metrics import extract_metrics
+from runwitness.runner import _command, run
+from runwitness.runner import _collector_command
 
 
-class FieldKitTests(unittest.TestCase):
+class RunWitnessTests(unittest.TestCase):
     def test_collector_command_is_argv_safe(self):
         command = ["python3", "job.py", "value with spaces"]
         wrapped = _collector_command(command, {"collector": {"command": ["/tmp/collector"], "sample_interval_ms": 25}}, Path("system.json"))
@@ -38,7 +38,7 @@ class FieldKitTests(unittest.TestCase):
 
     def test_collector_executable_resolves_from_config(self):
         with tempfile.TemporaryDirectory() as folder:
-            config_file = Path(folder) / "fieldkit.json"
+            config_file = Path(folder) / "runwitness.json"
             config_file.write_text(json.dumps({
                 "schema_version": "0.1", "benchmark": {"name": "x", "run": ["true"]},
                 "deployment": {"gates": [], "collector": {"command": ["./bin/collector"]}}
@@ -116,7 +116,7 @@ class FieldKitTests(unittest.TestCase):
         fixture = ROOT / "examples" / "fixture_benchmark"
         generated = fixture / "native-results.json"
         try:
-            config, source = load_config(fixture / "fieldkit.json")
+            config, source = load_config(fixture / "runwitness.json")
             with tempfile.TemporaryDirectory() as folder:
                 destination = Path(folder) / "bundle"
                 bundle, decision = run(config, source, destination)
@@ -132,7 +132,7 @@ class FieldKitTests(unittest.TestCase):
     def test_failing_benchmark_is_invalid(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            config_file = root / "fieldkit.json"
+            config_file = root / "runwitness.json"
             config_file.write_text(json.dumps({
                 "schema_version": "0.1",
                 "benchmark": {"name": "failure", "workdir": ".",

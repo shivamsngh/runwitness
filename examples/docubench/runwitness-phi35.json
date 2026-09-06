@@ -5,7 +5,7 @@
     "version": "DocuBench-0.2.0",
     "workdir": "${DOCUBENCH_HOME}",
     "run": [
-      "python3", "${FIELDKIT_HOME}/examples/docubench/ollama_subset.py",
+      "python3", "${RUNWITNESS_HOME}/examples/docubench/ollama_subset.py",
       "--repo", "${DOCUBENCH_HOME}",
       "--engine", "ollama-phi35-text-v1",
       "--model", "phi3.5:latest",
@@ -18,19 +18,19 @@
       "results/ollama-phi35-text-v1/PYhFptk3.json",
       "results/ollama-phi35-text-v1/C7fe2lau.json",
       "results/ollama-phi35-text-v1/eKzY7gEA.json",
-      "results/ollama-phi35-text-v1-fieldkit-summary.json"
+      "results/ollama-phi35-text-v1-runwitness-summary.json"
     ],
     "metrics": {
       "quality.aggregate": {
-        "file": "results/ollama-phi35-text-v1-fieldkit-summary.json",
+        "file": "results/ollama-phi35-text-v1-runwitness-summary.json",
         "path": "aggregate"
       },
       "quality.document_count": {
-        "file": "results/ollama-phi35-text-v1-fieldkit-summary.json",
+        "file": "results/ollama-phi35-text-v1-runwitness-summary.json",
         "path": "document_count"
       },
       "resources.ollama_vram_bytes": {
-        "file": "results/ollama-phi35-text-v1-fieldkit-summary.json",
+        "file": "results/ollama-phi35-text-v1-runwitness-summary.json",
         "path": "resources.ollama_vram_bytes"
       }
     }

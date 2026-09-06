@@ -1,6 +1,6 @@
 [package]
 name = "runwitness-collector"
-version = "0.2.0-alpha.1"
+version = "0.2.0"
 edition = "2024"
 description = "Descendant-process evidence collector for RunWitness"
 license = "MIT"

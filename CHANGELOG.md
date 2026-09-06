@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-09-06
 
 - Rename FieldKit to **RunWitness** across the repository, Python package, CLI,
   Rust collector, configuration examples, and documentation. The original

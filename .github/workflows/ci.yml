@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m unittest discover -s tests -v
+      - run: python -m pip wheel . --no-deps --wheel-dir dist
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+      - run: cargo fmt --manifest-path collector/Cargo.toml -- --check
+      - run: cargo clippy --manifest-path collector/Cargo.toml --all-targets -- -D warnings
+      - run: cargo test --manifest-path collector/Cargo.toml
+      - run: cargo publish --manifest-path collector/Cargo.toml --dry-run
+

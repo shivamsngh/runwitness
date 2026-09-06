@@ -4,6 +4,12 @@ version = "0.2.0-alpha.1"
 edition = "2024"
 description = "Descendant-process evidence collector for RunWitness"
 license = "MIT"
+repository = "https://github.com/shivamsngh/runwitness"
+homepage = "https://github.com/shivamsngh/runwitness"
+readme = "../README.md"
+keywords = ["ai", "evaluation", "evidence", "mlops", "air-gapped"]
+categories = ["command-line-utilities", "development-tools"]
+publish = ["crates-io"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

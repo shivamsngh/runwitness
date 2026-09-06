@@ -128,6 +128,10 @@ renamed before general adoption to avoid confusion with established projects.
 Development builds now use the `runwitness` Python module and CLI; GitHub redirects
 the former repository URL to this one. Existing evidence bundles remain readable.
 
+The canonical distribution identities are `runwitness` on PyPI and
+`runwitness-collector` on crates.io. Registry publication begins with the v0.2
+release; development builds are not presented as stable releases.
+
 ## Development
 
 ```bash

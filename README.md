@@ -147,6 +147,10 @@ python3 -m pip wheel . --no-deps --wheel-dir dist
 See the [contribution guide](CONTRIBUTING.md), [v0.3 roadmap](ROADMAP.md), and
 [changelog](CHANGELOG.md) for project direction and release history.
 
+The first proposed cloud assurance study is documented in the
+[AWS restricted-egress AI reference-case design](docs/AWS-REFERENCE-CASE.md). It is
+a pre-provisioning specification, not a completed evaluation or certification.
+
 ## License and benchmark boundaries
 
 RunWitness is MIT licensed. External benchmarks and datasets retain their own

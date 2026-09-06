@@ -107,6 +107,8 @@ cloud provider. It will include:
 
 Additional providers and architectures can follow as evidence collection becomes
 repeatable. Public cases will favor depth and reproducibility over broad checklists.
+The initial proposal is the
+[AWS restricted-egress AI deployment reference case](docs/AWS-REFERENCE-CASE.md).
 
 ### Enterprise assessment reports
 

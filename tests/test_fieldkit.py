@@ -23,6 +23,11 @@ class FieldKitTests(unittest.TestCase):
         wrapped = _collector_command(command, {"collector": {"command": ["/tmp/collector"], "sample_interval_ms": 25}}, Path("system.json"))
         self.assertEqual(wrapped, ["/tmp/collector", "run", "--output", "system.json", "--sample-interval-ms", "25", "--"] + command)
 
+    def test_network_deny_is_passed_to_collector(self):
+        wrapped = _collector_command(["job"], {"collector": {"command": ["collector"]},
+                                                    "network": {"mode": "deny"}}, Path("system.json"))
+        self.assertIn("--network-deny", wrapped)
+
     def test_config_validates_collector(self):
         base = {"schema_version": "0.1", "benchmark": {"name": "x", "run": ["true"]},
                 "deployment": {"gates": [], "collector": {"command": ["collector"], "sample_interval_ms": 100}}}

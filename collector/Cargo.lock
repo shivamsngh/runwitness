@@ -22,6 +22,7 @@ dependencies = [
 name = "fieldkit-collector"
 version = "0.2.0-alpha.1"
 dependencies = [
+ "libc",
  "serde",
  "serde_json",
  "sysinfo",

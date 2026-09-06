@@ -93,8 +93,11 @@ def _collector_command(command, deployment, evidence_path):
     collector = deployment.get("collector")
     if not collector:
         return command
-    return (list(collector["command"]) + ["run", "--output", str(evidence_path),
-            "--sample-interval-ms", str(collector.get("sample_interval_ms", 100)), "--"] + command)
+    options = ["run", "--output", str(evidence_path),
+               "--sample-interval-ms", str(collector.get("sample_interval_ms", 100))]
+    if deployment.get("network", {}).get("mode") == "deny":
+        options.append("--network-deny")
+    return list(collector["command"]) + options + ["--"] + command
 
 
 def _safe_source(workdir, relative):
@@ -162,10 +165,14 @@ def run(config, config_path, output_dir):
         try:
             system_evidence = json.loads(system_evidence_path.read_text(encoding="utf-8"))
             system_evidence["artifact"] = {"path": "evidence/system.json", "sha256": sha256(system_evidence_path)}
-            metrics["resources.process_tree_peak_rss_mb"] = round(system_evidence["peak_tree_rss_bytes"] / 1048576, 3)
-            metrics["resources.process_tree_peak_count"] = system_evidence["peak_process_count"]
+            if system_evidence.get("status") == "complete":
+                metrics["resources.process_tree_peak_rss_mb"] = round(system_evidence["peak_tree_rss_bytes"] / 1048576, 3)
+                metrics["resources.process_tree_peak_count"] = system_evidence["peak_process_count"]
         except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError):
             system_evidence = {"status": "invalid", "note": "collector evidence could not be parsed"}
+    if system_evidence and system_evidence.get("network"):
+        isolation.update(system_evidence["network"])
+        metrics["isolation.enforced"] = isolation["enforced"]
     run_valid = execution.get("exit_code") == 0 and not execution.get("timed_out")
     decision = evaluate(deployment.get("gates", []), metrics, run_valid)
     manifest = {
@@ -178,7 +185,7 @@ def run(config, config_path, output_dir):
                        "policy": deployment.get("policy"), "network": isolation},
         "host": host_evidence(), "validation": validation,
         "execution": {**execution, "resource_scope": ("benchmark root process and sampled descendants; external runtimes require adapter-native evidence"
-                                                        if system_evidence and system_evidence.get("status") != "invalid"
+                                                        if system_evidence and system_evidence.get("status") == "complete"
                                                         else "adapter root process only; external runtimes require adapter-native evidence")},
         "collector": system_evidence,
         "metrics": metrics, "metric_mapping_errors": mapping_errors,

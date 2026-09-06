@@ -18,6 +18,7 @@ struct ObservedProcess {
 
 #[derive(Serialize)]
 struct Evidence {
+    status: &'static str,
     schema_version: &'static str,
     collector: CollectorIdentity,
     scope: Scope,
@@ -30,6 +31,7 @@ struct Evidence {
     peak_tree_rss_bytes: u64,
     peak_process_count: usize,
     observed_processes: Vec<ObservedProcess>,
+    network: NetworkEvidence,
 }
 
 #[derive(Serialize)]
@@ -45,15 +47,34 @@ struct Scope {
     command_arguments_recorded: bool,
 }
 
+#[derive(Serialize)]
+struct NetworkEvidence {
+    requested_mode: &'static str,
+    enforced: bool,
+    mechanism: Option<&'static str>,
+    attempt_observation: &'static str,
+    note: &'static str,
+}
+
+#[derive(Serialize)]
+struct FailureEvidence<'a> {
+    schema_version: &'static str,
+    status: &'static str,
+    collector: CollectorIdentity,
+    error: &'a str,
+    network: NetworkEvidence,
+}
+
 struct Options {
     output: PathBuf,
     interval_ms: u64,
     command: Vec<String>,
+    network_deny: bool,
 }
 
 fn usage(message: &str) -> ! {
     eprintln!(
-        "{message}\nusage: fieldkit-collector run --output FILE [--sample-interval-ms N] -- COMMAND [ARG ...]"
+        "{message}\nusage: fieldkit-collector run --output FILE [--sample-interval-ms N] [--network-deny] -- COMMAND [ARG ...]"
     );
     std::process::exit(2);
 }
@@ -69,6 +90,7 @@ fn parse_args() -> Options {
         .unwrap_or_else(|| usage("missing '--' before command"));
     let mut output = None;
     let mut interval_ms = 100_u64;
+    let mut network_deny = false;
     let mut index = 1;
     while index < separator {
         match args[index].as_str() {
@@ -86,6 +108,7 @@ fn parse_args() -> Options {
                         usage("sample interval must be an integer of at least 10 ms")
                     });
             }
+            "--network-deny" => network_deny = true,
             other => usage(&format!("unknown option: {other}")),
         }
         index += 1;
@@ -98,7 +121,57 @@ fn parse_args() -> Options {
         output: output.unwrap_or_else(|| usage("missing --output")),
         interval_ms,
         command,
+        network_deny,
     }
+}
+
+fn network_evidence(requested: bool, enforced: bool) -> NetworkEvidence {
+    NetworkEvidence {
+        requested_mode: if requested { "deny" } else { "not_enforced" },
+        enforced,
+        mechanism: enforced.then_some("linux_network_namespace"),
+        attempt_observation: "unavailable",
+        note: if enforced {
+            "A new Linux network namespace was created before benchmark exec; network attempts are not traced."
+        } else if requested {
+            "Isolation was requested but not established; the benchmark did not run."
+        } else {
+            "No collector-level network isolation was requested."
+        },
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn spawn_benchmark(options: &Options) -> std::io::Result<Child> {
+    use std::os::unix::process::CommandExt;
+    let mut command = Command::new(&options.command[0]);
+    command.args(&options.command[1..]);
+    if options.network_deny {
+        // SAFETY: pre_exec performs only the async-signal-safe unshare syscall and
+        // constructs an OS error if it fails. No heap allocation occurs in the child.
+        unsafe {
+            command.pre_exec(|| {
+                if libc::unshare(libc::CLONE_NEWNET) == -1 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                Ok(())
+            });
+        }
+    }
+    command.spawn()
+}
+
+#[cfg(not(target_os = "linux"))]
+fn spawn_benchmark(options: &Options) -> std::io::Result<Child> {
+    if options.network_deny {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Unsupported,
+            "--network-deny requires Linux",
+        ));
+    }
+    Command::new(&options.command[0])
+        .args(&options.command[1..])
+        .spawn()
 }
 
 fn descendants(system: &System, root: Pid) -> HashSet<Pid> {
@@ -175,6 +248,7 @@ fn run(mut child: Child, options: &Options) -> Result<(Evidence, i32), String> {
             observed.sort_by_key(|item| item.pid);
             return Ok((
                 Evidence {
+                    status: "complete",
                     schema_version: "0.1",
                     collector: CollectorIdentity {
                         name: "fieldkit-collector",
@@ -194,6 +268,7 @@ fn run(mut child: Child, options: &Options) -> Result<(Evidence, i32), String> {
                     peak_tree_rss_bytes: peak_rss,
                     peak_process_count: peak_count,
                     observed_processes: observed,
+                    network: network_evidence(options.network_deny, options.network_deny),
                 },
                 code,
             ));
@@ -204,13 +279,23 @@ fn run(mut child: Child, options: &Options) -> Result<(Evidence, i32), String> {
 
 fn main() -> ExitCode {
     let options = parse_args();
-    let child = match Command::new(&options.command[0])
-        .args(&options.command[1..])
-        .spawn()
-    {
+    let child = match spawn_benchmark(&options) {
         Ok(child) => child,
         Err(error) => {
             eprintln!("could not start benchmark: {error}");
+            let failure = FailureEvidence {
+                schema_version: "0.1",
+                status: "invalid",
+                collector: CollectorIdentity {
+                    name: "fieldkit-collector",
+                    version: env!("CARGO_PKG_VERSION"),
+                },
+                error: &error.to_string(),
+                network: network_evidence(options.network_deny, false),
+            };
+            if let Ok(file) = File::create(&options.output) {
+                let _ = serde_json::to_writer_pretty(file, &failure);
+            }
             return ExitCode::from(126);
         }
     };
@@ -249,6 +334,7 @@ mod tests {
             output: PathBuf::from("unused.json"),
             interval_ms: 10,
             command: vec![],
+            network_deny: false,
         };
         let (evidence, code) = run(child, &options).expect("collection should succeed");
         assert_eq!(code, 0);

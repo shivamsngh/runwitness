@@ -82,6 +82,12 @@ cargo build --release --manifest-path collector/Cargo.toml
 See the [collector setup and evidence boundary](docs/system-collector.md). This
 preview is additive: existing configurations continue to work without Rust.
 
+On Linux, setting `network.mode` to `deny` makes the collector enter a fresh
+network namespace before it starts the benchmark. The operation fails closed:
+if isolation cannot be established, the benchmark does not run. Enforcement and
+attempt observation remain separate evidence fields. See the
+[Linux isolation threat model](docs/network-isolation.md).
+
 ## Adapter contract
 
 An adapter declares benchmark identity, an argv command, native result files,
@@ -111,9 +117,9 @@ records Ollama-reported model allocation and VRAM through its local API. Neither
 is presented as whole-machine peak memory. Likewise, declaring a target
 air-gapped is not treated as proof of isolation.
 
-Planned assurance work includes GPU telemetry, OS-level network isolation and
-observation, signed attestations, independent offline verification, and
-Kubernetes/private-cloud collectors.
+Planned assurance work includes network-attempt observation, GPU telemetry,
+signed attestations, independent offline verification, and Kubernetes/private-cloud
+collectors.
 
 ## Development
 

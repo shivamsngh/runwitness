@@ -33,13 +33,19 @@ jobs:
       - run: cargo build --manifest-path collector/Cargo.toml
       - name: Verify Linux network namespace enforcement
         run: |
-          test -e /sys/class/net/eth0
-
-          sudo ./collector/target/debug/runwitness-collector \
-            run \
-            --output "$PWD/collector/target/network-isolation-evidence.json" \
-            --network-deny \
-            -- /bin/sh -c 'test ! -e /sys/class/net/eth0'
+          docker run --rm \
+            --privileged \
+            -v "$PWD:/work" \
+            -w /work \
+            ubuntu:24.04 \
+            /bin/sh -c '
+              test -e /sys/class/net/eth0 &&
+              ./collector/target/debug/runwitness-collector \
+                run \
+                --output /work/collector/target/network-isolation-evidence.json \
+                --network-deny \
+                -- /bin/sh -c "test ! -e /sys/class/net/eth0"
+            '
 
           python - <<'PY'
           import json

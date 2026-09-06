@@ -4,6 +4,9 @@ import shutil
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from importlib.metadata import version
+from io import StringIO
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,9 +18,18 @@ from runwitness.gates import evaluate
 from runwitness.metrics import extract_metrics
 from runwitness.runner import _command, run
 from runwitness.runner import _collector_command
+from runwitness.cli import parser
 
 
 class RunWitnessTests(unittest.TestCase):
+    def test_version_matches_package_metadata(self):
+        output = StringIO()
+        with redirect_stdout(output), self.assertRaises(SystemExit) as exited:
+            parser().parse_args(["--version"])
+
+        self.assertEqual(exited.exception.code, 0)
+        self.assertEqual(output.getvalue().strip(), f"runwitness {version('runwitness')}")
+
     def test_collector_command_is_argv_safe(self):
         command = ["python3", "job.py", "value with spaces"]
         wrapped = _collector_command(command, {"collector": {"command": ["/tmp/collector"], "sample_interval_ms": 25}}, Path("system.json"))

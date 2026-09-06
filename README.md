@@ -1,101 +1,115 @@
-# FieldKit
+<p align="center"><img src="docs/assets/fieldkit-icon.png" width="128" alt="FieldKit icon"></p>
+<h1 align="center">FieldKit</h1>
+<p align="center"><strong>Deployment evidence around the benchmark you already trust.</strong></p>
+<p align="center">
+  <a href="https://github.com/shivamsngh/fieldkit/releases/tag/v0.1.0"><img alt="Release v0.1.0" src="https://img.shields.io/badge/release-v0.1.0-21c96b"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-17211c"></a>
+  <img alt="Python 3.9+" src="https://img.shields.io/badge/python-3.9%2B-17211c">
+</p>
 
-FieldKit turns an independent AI benchmark run into a deployment evidence bundle.
-It does **not** replace, fork, or redefine the benchmark. The benchmark owns its
-datasets, execution, native outputs, and scoring. FieldKit adds the operational
-context needed to answer a different question: *did this model and system satisfy
-the declared requirements of this deployment?*
+FieldKit runs an independent AI benchmark, preserves its native results, captures
+operational context, and evaluates explicit deployment gates. The benchmark
+continues to own its datasets, execution, and scoring; FieldKit answers the next
+question: **did this model and system satisfy the declared requirements of this
+deployment?**
 
-## Why it exists
+![FieldKit architecture](docs/assets/architecture.svg)
 
-A quality score alone is not a production decision. Regulated, sovereign, and
-air-gapped deployments also need evidence about runtime, resources, isolation,
-provenance, and explicit acceptance gates. FieldKit keeps those concerns outside
-the benchmark while packaging them into one reviewable run record.
+## Why FieldKit
 
-## Current status
+A quality score is not a production decision. Sovereign, regulated, private, and
+air-gapped environments also need evidence about runtime, resources, isolation,
+provenance, and acceptance criteria. FieldKit packages those facts without
+absorbing or redefining the benchmark.
 
-Version 0.1.0 is a working reference implementation. It provides:
+- **Benchmark-agnostic:** execute any tool that exposes a command and JSON results.
+- **Native results preserved:** benchmark artifacts are copied unchanged and hashed.
+- **Evidence is scoped:** declared, enforced, observed, and unavailable facts stay distinct.
+- **Decisions are explicit:** gates resolve to `pass`, `fail`, `unknown`, or `invalid`.
+- **Offline-friendly:** no FieldKit service, account, or runtime dependency is required.
 
-- a benchmark-agnostic command adapter;
-- JSON metric mapping from native benchmark results;
-- runtime, root-process memory, host, disk-delta, and isolation evidence;
-- `pass`, `fail`, `unknown`, and `invalid` gate decisions;
-- SHA-256 integrity records and a self-contained HTML report;
-- a runnable fixture and a DocuBench integration template.
-- local Ollama reference adapters and a named DocuBench starter smoke profile.
+## Real evidence from v0.1.0
 
-FieldKit v0.1 captures benchmark outputs, runtime evidence, host context, integrity hashes, and policy decisions. Deeper assurance capabilities—including process-tree and GPU telemetry, enforced network isolation, network-attempt observation, signed attestations, and independent air-gap verification—are planned for subsequent releases.
+The reference integration ran local Ollama models against eight cases selected
+from DocuBench's existing 72-document corpus. This is an integration smoke
+profile—not a replacement for the full benchmark and not a production threshold.
 
-Resource claims are explicitly scoped. FieldKit measures the adapter root
-process directly. The Ollama adapter separately records Ollama-reported loaded
-model and VRAM allocation through its local API; that is not presented as host
-peak RSS or whole-system energy consumption.
+![FieldKit starter evidence](docs/assets/starter-evidence.svg)
 
-If direct root-process sampling is unavailable, FieldKit labels and uses the
-operating system's completed-child high-water mark as a fallback instead of
-silently reporting zero usage.
+The variation is the point: an aggregate alone hides that Ministral-3 reached
+92.21% on a PDF table but only 13.64% on a Hebrew RTL invoice. FieldKit retains
+the native evidence needed to make that distinction.
 
 ## Quick start
 
-Requires Python 3.9 or newer and no runtime dependencies.
-
 ```bash
+git clone https://github.com/shivamsngh/fieldkit.git
+cd fieldkit
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -e .
+
 python3 -m fieldkit validate examples/fixture_benchmark/fieldkit.json
 python3 -m fieldkit run examples/fixture_benchmark/fieldkit.json --output runs/fixture-001
+open runs/fixture-001/report.html
 ```
 
-Using `python3 -m fieldkit` is recommended because it works even when the Python
-user scripts directory is not present on the shell's `PATH`.
+Use a new output directory for every run. FieldKit will not overwrite an
+existing evidence bundle.
 
-Open `runs/fixture-001/report.html`. The bundle also contains the benchmark's
-native result, stdout/stderr, evidence records, `manifest.json`, and
-`decision.json`.
+## Verify and compare evidence
 
-FieldKit itself can be installed in a virtual environment. A benchmark may also
-declare its own environment with `"venv": ".venv"`. When its command begins
-with `python` or `python3`, FieldKit uses that environment's interpreter and
-records the resolved environment path in the manifest. The benchmark process is
-still the measured process; activating a shell environment is unnecessary.
+```bash
+python3 -m fieldkit verify runs/fixture-001
+python3 -m fieldkit compare runs/baseline runs/candidate
+```
+
+`verify` recalculates native-result hashes and detects missing or modified
+artifacts. `compare` produces a machine-readable metric delta across two bundles.
 
 ## Adapter contract
 
-An adapter declares an argv command, its external working directory, native
-result files, and explicit JSON paths for metrics. Commands are executed without
-a shell. Result paths must remain inside the benchmark working directory.
+An adapter declares benchmark identity, an argv command, native result files,
+JSON metric paths, a named deployment policy, and optionally its own virtual
+environment. Commands run without a shell, and result paths may not escape the
+benchmark working directory. See the [adapter contract](docs/adapter-contract.md)
+and [runnable fixture](examples/fixture_benchmark/fieldkit.json).
 
-See [`docs/adapter-contract.md`](docs/adapter-contract.md) and the runnable
-[`examples/fixture_benchmark/fieldkit.json`](examples/fixture_benchmark/fieldkit.json).
+## Ollama + DocuBench
 
-To evaluate a local Ollama model with DocuBench, see
-[`docs/ollama-docubench.md`](docs/ollama-docubench.md). That workflow keeps
-DocuBench, the model runner, and FieldKit as three separate layers.
+The reference adapters keep three clean boundaries:
 
-The starter profile selects eight cases from DocuBench's existing 72-document
-corpus. It provides quick integration coverage and does not replace the complete
-authoritative benchmark.
+1. Ollama and the selected model produce schema-shaped document extractions.
+2. DocuBench validates and scores those results with its original scorer.
+3. FieldKit records deployment evidence and evaluates gates.
 
-## DocuBench boundary
+No DocuBench source, documents, labels, schemas, or scoring logic are vendored.
+See the [complete workflow](docs/ollama-docubench.md), the
+[Ministral-3 vision adapter](examples/docubench/fieldkit.json), and the
+[Phi 3.5 text adapter](examples/docubench/fieldkit-phi35.json).
 
-The example under `examples/docubench` is configuration only. It expects a
-separate DocuBench checkout and deliberately includes none of DocuBench's source,
-datasets, labels, schemas, or scoring logic. The exact command, result filename,
-and metric path must be aligned to the version installed by the operator.
+## Evidence boundaries
 
-FieldKit is not affiliated with DocuPipe or DocuBench.
+FieldKit v0.1.0 directly measures the adapter process. The Ollama adapter also
+records Ollama-reported model allocation and VRAM through its local API. Neither
+is presented as whole-machine peak memory. Likewise, declaring a target
+air-gapped is not treated as proof of isolation.
 
-## Roadmap
+Planned assurance work includes process-tree and GPU telemetry, OS-level network
+isolation and observation, signed attestations, independent offline verification,
+and Kubernetes/private-cloud collectors.
 
-- Process-tree, container, and GPU telemetry
-- OS-level network isolation and observation
-- Cryptographically signed evidence bundles
-- Independent offline verification
-- Kubernetes and private-cloud collectors
+## Development
 
-## License
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m pip wheel . --no-deps --wheel-dir dist
+```
 
-FieldKit is MIT licensed. External benchmarks and their data retain their own
-licenses and terms.
+See the [changelog](CHANGELOG.md) for release history.
+
+## License and benchmark boundaries
+
+FieldKit is MIT licensed. External benchmarks and datasets retain their own
+licenses and terms. FieldKit is not affiliated with DocuPipe, DocuBench, Ollama,
+Microsoft, or Mistral AI.

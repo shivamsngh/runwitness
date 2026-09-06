@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added evidence-bundle integrity verification with `fieldkit verify`.
+- Added metric comparison with `fieldkit compare`, including comparability warnings.
+- Added a project icon, architecture visual, and evidence-backed benchmark graphic.
+- Reworked the README around the benchmark-boundary and deployment-evidence proposition.
+
 ## 0.1.0 — 2026-09-06
 
 - Added benchmark-agnostic command execution and JSON metric mapping.

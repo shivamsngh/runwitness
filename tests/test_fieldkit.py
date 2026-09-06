@@ -10,12 +10,38 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fieldkit.config import ConfigError, load_config, validate_config
+from fieldkit.bundle import compare_bundles, verify_bundle
 from fieldkit.gates import evaluate
 from fieldkit.metrics import extract_metrics
 from fieldkit.runner import _command, run
 
 
 class FieldKitTests(unittest.TestCase):
+    def test_verify_and_compare_bundles(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            bundles = []
+            for index, score in enumerate((0.5, 0.8)):
+                bundle = root / str(index)
+                (bundle / "benchmark").mkdir(parents=True)
+                artifact = bundle / "benchmark" / "result.json"
+                artifact.write_text(json.dumps({"score": score}))
+                import hashlib
+                digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+                (bundle / "manifest.json").write_text(json.dumps({
+                    "run_id": str(index), "benchmark": {"name": "fixture", "native_results": [
+                        {"path": "benchmark/result.json", "sha256": digest}
+                    ]}, "metrics": {"quality": score, "isolation": False}
+                }))
+                (bundle / "decision.json").write_text('{}')
+                bundles.append(bundle)
+            self.assertEqual(verify_bundle(bundles[0])["overall"], "pass")
+            comparison = compare_bundles(bundles[0], bundles[1])
+            by_name = {item["metric"]: item for item in comparison["metrics"]}
+            self.assertIsNone(by_name["isolation"]["delta"])
+            self.assertAlmostEqual(by_name["quality"]["delta"], 0.3)
+            (bundles[0] / "benchmark" / "result.json").write_text("tampered")
+            self.assertEqual(verify_bundle(bundles[0])["overall"], "fail")
     def test_config_rejects_shell_string(self):
         with self.assertRaises(ConfigError):
             validate_config({"schema_version": "0.1", "benchmark": {"name": "x", "run": "echo x"},

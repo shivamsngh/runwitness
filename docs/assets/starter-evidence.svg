@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="610" viewBox="0 0 1200 610" role="img" aria-labelledby="title desc">
+  <title id="title">FieldKit starter evidence results</title>
+  <desc id="desc">DocuBench subset scores from local Ollama models. Ministral vision averaged 60.15 percent across five documents and Phi 3.5 text averaged 63.90 percent across three documents.</desc>
+  <rect width="1200" height="610" rx="28" fill="#101512"/>
+  <text x="64" y="76" fill="#f4f7f4" font-family="system-ui,sans-serif" font-size="34" font-weight="700">Evidence varies by deployment path.</text>
+  <text x="64" y="112" fill="#9baaa1" font-family="system-ui,sans-serif" font-size="18">DocuBench starter profile · local Ollama · example policy, not a production threshold</text>
+  <g font-family="system-ui,sans-serif" font-size="17">
+    <text x="64" y="173" fill="#f4f7f4" font-size="22" font-weight="650">Ministral-3 · vision</text><text x="1090" y="173" fill="#21df73" text-anchor="end" font-size="22" font-weight="700">60.15%</text>
+    <g fill="#aeb9b2"><text x="64" y="219">PDF table</text><text x="64" y="263">Photo receipt</text><text x="64" y="307">Rotated receipt</text><text x="64" y="351">Handwriting</text><text x="64" y="395">Hebrew RTL</text></g>
+    <g fill="#26302a"><rect x="245" y="201" width="800" height="22" rx="11"/><rect x="245" y="245" width="800" height="22" rx="11"/><rect x="245" y="289" width="800" height="22" rx="11"/><rect x="245" y="333" width="800" height="22" rx="11"/><rect x="245" y="377" width="800" height="22" rx="11"/></g>
+    <g fill="#21df73"><rect x="245" y="201" width="738" height="22" rx="11"/><rect x="245" y="245" width="630" height="22" rx="11"/><rect x="245" y="289" width="497" height="22" rx="11"/><rect x="245" y="333" width="433" height="22" rx="11"/><rect x="245" y="377" width="109" height="22" rx="11"/></g>
+    <g fill="#f4f7f4" text-anchor="end"><text x="1090" y="219">92.21%</text><text x="1090" y="263">78.72%</text><text x="1090" y="307">62.12%</text><text x="1090" y="351">54.09%</text><text x="1090" y="395">13.64%</text></g>
+    <line x1="64" y1="438" x2="1136" y2="438" stroke="#2e3932"/>
+    <text x="64" y="487" fill="#f4f7f4" font-size="22" font-weight="650">Phi 3.5 · native text</text><text x="1090" y="487" fill="#21df73" text-anchor="end" font-size="22" font-weight="700">63.90%</text>
+    <text x="64" y="537" fill="#9baaa1">HTML clinical 100%  ·  EDI purchase order 68.52%  ·  XML invoice 23.19%</text>
+    <text x="64" y="578" fill="#65736a" font-size="14">8-document smoke profile selected from DocuBench's 72-document corpus. Scores are architecture-specific and not directly equivalent.</text>
+  </g>
+</svg>

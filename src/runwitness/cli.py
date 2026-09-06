@@ -3,6 +3,7 @@ import json
 import sys
 from pathlib import Path
 
+from . import __version__
 from .config import ConfigError, load_config
 from .bundle import compare_bundles, verify_bundle
 from .runner import run
@@ -10,6 +11,7 @@ from .runner import run
 
 def parser():
     root = argparse.ArgumentParser(prog="runwitness", description="Run any benchmark with deployment evidence")
+    root.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     commands = root.add_subparsers(dest="command", required=True)
     validate = commands.add_parser("validate", help="validate an adapter and policy")
     validate.add_argument("config")

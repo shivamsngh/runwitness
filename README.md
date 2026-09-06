@@ -54,6 +54,10 @@ python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -e .
 
+# Print the installed RunWitness package version for support reports.
+runwitness --version
+python3 -m runwitness --version
+
 python3 -m runwitness validate examples/fixture_benchmark/runwitness.json
 python3 -m runwitness run examples/fixture_benchmark/runwitness.json --output runs/fixture-001
 open runs/fixture-001/report.html

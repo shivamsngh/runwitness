@@ -60,6 +60,17 @@ class RunWitnessTests(unittest.TestCase):
             self.assertEqual(verify_bundle(root)["overall"], "pass")
             evidence.write_text('{"peak_process_count": 999}')
             self.assertEqual(verify_bundle(root)["overall"], "fail")
+
+    def test_verify_accepts_bundle_without_optional_collector(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "manifest.json").write_text(json.dumps({
+                "run_id": "no-collector", "benchmark": {"native_results": []},
+                "collector": None,
+            }))
+            (root / "decision.json").write_text("{}")
+            self.assertEqual(verify_bundle(root)["overall"], "pass")
+
     def test_verify_and_compare_bundles(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

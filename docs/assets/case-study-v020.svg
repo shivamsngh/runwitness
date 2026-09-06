@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">RunWitness v0.2 local document extraction evidence</title>
+  <desc id="desc">Two independent DocuBench starter tracks for Ministral-3 vision and Phi 3.5 text, with aggregate quality, runtime, and Ollama allocation. Tracks are not directly comparable.</desc>
+  <rect width="1200" height="650" fill="#f3f3ee"/>
+  <text x="72" y="78" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="2" fill="#17211c">RUNWITNESS · VERIFIED LOCAL EVIDENCE</text>
+  <text x="72" y="132" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#08100c">Document extraction beyond one score</text>
+  <text x="72" y="170" font-family="Arial, sans-serif" font-size="20" fill="#4a554f">DocuBench starter profile · Ollama 0.33.3 · 6 September 2026</text>
+
+  <rect x="72" y="220" width="500" height="280" rx="18" fill="#08100c"/>
+  <text x="104" y="266" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#21c96b">VISION TRACK · 5 DOCUMENTS</text>
+  <text x="104" y="316" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#ffffff">Ministral-3</text>
+  <text x="104" y="378" font-family="Arial, sans-serif" font-size="60" font-weight="700" fill="#ffffff">60.15%</text>
+  <text x="104" y="410" font-family="Arial, sans-serif" font-size="16" fill="#bbc4bf">DocuBench aggregate</text>
+  <text x="104" y="456" font-family="Arial, sans-serif" font-size="18" fill="#ffffff">399.48 s · 5.63 GB Ollama allocation</text>
+  <text x="104" y="482" font-family="Arial, sans-serif" font-size="15" fill="#8f9a94">Range: 13.64% RTL invoice → 92.21% PDF table</text>
+
+  <rect x="628" y="220" width="500" height="280" rx="18" fill="#ffffff" stroke="#c8cec9" stroke-width="2"/>
+  <text x="660" y="266" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#15854a">NATIVE-TEXT TRACK · 3 DOCUMENTS</text>
+  <text x="660" y="316" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#08100c">Phi 3.5</text>
+  <text x="660" y="378" font-family="Arial, sans-serif" font-size="60" font-weight="700" fill="#08100c">63.90%</text>
+  <text x="660" y="410" font-family="Arial, sans-serif" font-size="16" fill="#59635e">DocuBench aggregate</text>
+  <text x="660" y="456" font-family="Arial, sans-serif" font-size="18" fill="#08100c">90.77 s · 3.84 GB Ollama allocation</text>
+  <text x="660" y="482" font-family="Arial, sans-serif" font-size="15" fill="#59635e">Range: 23.19% XML invoice → 100% HTML lists</text>
+
+  <rect x="72" y="540" width="1056" height="56" rx="28" fill="#dfe6e1"/>
+  <text x="600" y="575" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#17211c">Different documents + different input pipelines = not a head-to-head model ranking</text>
+  <text x="72" y="628" font-family="Arial, sans-serif" font-size="14" fill="#59635e">Both bundles: deployment decision PASS · artifact integrity PASS · network isolation not enforced</text>
+</svg>

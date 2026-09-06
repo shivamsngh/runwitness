@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1",
+  "benchmark": {
+    "name": "DocuBench starter profile / Ministral-3 vision",
+    "version": "DocuBench-0.2.0",
+    "workdir": "${DOCUBENCH_HOME}",
+    "run": [
+      "python3", "${RUNWITNESS_HOME}/examples/docubench/ollama_subset.py",
+      "--repo", "${DOCUBENCH_HOME}",
+      "--engine", "runwitness-ministral3-vision-v020",
+      "--model", "ministral-3:latest",
+      "--mode", "vision",
+      "--doc-id", "vBIz5dut",
+      "--doc-id", "ZXlksSpk",
+      "--doc-id", "NNaGgwE5",
+      "--doc-id", "nESapyAA",
+      "--doc-id", "B0nA2c30"
+    ],
+    "native_results": [
+      "results/runwitness-ministral3-vision-v020/vBIz5dut.json",
+      "results/runwitness-ministral3-vision-v020/ZXlksSpk.json",
+      "results/runwitness-ministral3-vision-v020/NNaGgwE5.json",
+      "results/runwitness-ministral3-vision-v020/nESapyAA.json",
+      "results/runwitness-ministral3-vision-v020/B0nA2c30.json",
+      "results/runwitness-ministral3-vision-v020-runwitness-summary.json"
+    ],
+    "metrics": {
+      "quality.aggregate": {
+        "file": "results/runwitness-ministral3-vision-v020-runwitness-summary.json",
+        "path": "aggregate"
+      },
+      "quality.document_count": {
+        "file": "results/runwitness-ministral3-vision-v020-runwitness-summary.json",
+        "path": "document_count"
+      },
+      "resources.ollama_vram_bytes": {
+        "file": "results/runwitness-ministral3-vision-v020-runwitness-summary.json",
+        "path": "resources.ollama_vram_bytes"
+      }
+    }
+  },
+  "deployment": {
+    "name": "local-ollama-evaluation",
+    "policy": {
+      "name": "docubench-starter-smoke-v0.2",
+      "status": "example-not-production",
+      "rationale": "Exercises integration behavior; thresholds are not production recommendations."
+    },
+    "timeout_seconds": 7200,
+    "network": {"mode": "local-service-not-enforced"},
+    "gates": [
+      {"metric": "quality.aggregate", "op": "exists"},
+      {"metric": "quality.document_count", "op": "==", "value": 5},
+      {"metric": "runtime.exit_code", "op": "==", "value": 0}
+    ]
+  }
+}

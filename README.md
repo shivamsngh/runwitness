@@ -30,17 +30,20 @@ absorbing or redefining the benchmark.
 - **Decisions are explicit:** gates resolve to `pass`, `fail`, `unknown`, or `invalid`.
 - **Offline-friendly:** no RunWitness service, account, or runtime dependency is required.
 
-## Real evidence from v0.1.0
+## Real evidence from v0.2.0
 
 The reference integration ran local Ollama models against eight cases selected
-from DocuBench's existing 72-document corpus. This is an integration smoke
-profile—not a replacement for the full benchmark and not a production threshold.
+from DocuBench's existing 72-document corpus. Both immutable evidence bundles
+passed their smoke policy and artifact-integrity verification. This is not a
+replacement for the full benchmark and not a production threshold.
 
-![RunWitness starter evidence](docs/assets/starter-evidence.svg)
+![RunWitness v0.2 case-study evidence](docs/assets/case-study-v020.svg)
 
 The variation is the point: an aggregate alone hides that Ministral-3 reached
-92.21% on a PDF table but only 13.64% on a Hebrew RTL invoice. RunWitness retains
-the native evidence needed to make that distinction.
+92.21% on a PDF table but only 13.64% on a Hebrew RTL invoice. The Phi track used
+three different, native-text documents, so its aggregate is explicitly not
+presented as a head-to-head model comparison. Read the
+[evidence-backed case study](docs/case-study-docubench-v0.2.md).
 
 ## Quick start
 

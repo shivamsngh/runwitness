@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add reproducible Ministral-3 vision and Phi 3.5 text DocuBench case-study manifests and an evidence-bounded report.
+- Fix `runwitness verify` for valid bundles that omit the optional Rust collector.
+
 ## 0.2.0 — 2026-09-06
 
 - Rename FieldKit to **RunWitness** across the repository, Python package, CLI,

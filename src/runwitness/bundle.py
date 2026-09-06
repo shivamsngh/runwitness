@@ -29,7 +29,8 @@ def verify_bundle(bundle):
             status = "pass" if actual == artifact.get("sha256") else "fail"
         checks.append({"name": "native_result", "path": relative, "expected_sha256": artifact.get("sha256"),
                        "actual_sha256": actual, "status": status})
-    collector_artifact = manifest.get("collector", {}).get("artifact")
+    collector = manifest.get("collector") or {}
+    collector_artifact = collector.get("artifact")
     if collector_artifact:
         relative = collector_artifact.get("path", "")
         target = (root / relative).resolve()

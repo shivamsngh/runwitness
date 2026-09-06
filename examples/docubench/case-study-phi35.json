@@ -1,0 +1,53 @@
+{
+  "schema_version": "0.1",
+  "benchmark": {
+    "name": "DocuBench starter profile / Phi 3.5 text",
+    "version": "DocuBench-0.2.0",
+    "workdir": "${DOCUBENCH_HOME}",
+    "run": [
+      "python3", "${RUNWITNESS_HOME}/examples/docubench/ollama_subset.py",
+      "--repo", "${DOCUBENCH_HOME}",
+      "--engine", "runwitness-phi35-text-v020",
+      "--model", "phi3.5:latest",
+      "--mode", "text",
+      "--doc-id", "PYhFptk3",
+      "--doc-id", "C7fe2lau",
+      "--doc-id", "eKzY7gEA"
+    ],
+    "native_results": [
+      "results/runwitness-phi35-text-v020/PYhFptk3.json",
+      "results/runwitness-phi35-text-v020/C7fe2lau.json",
+      "results/runwitness-phi35-text-v020/eKzY7gEA.json",
+      "results/runwitness-phi35-text-v020-runwitness-summary.json"
+    ],
+    "metrics": {
+      "quality.aggregate": {
+        "file": "results/runwitness-phi35-text-v020-runwitness-summary.json",
+        "path": "aggregate"
+      },
+      "quality.document_count": {
+        "file": "results/runwitness-phi35-text-v020-runwitness-summary.json",
+        "path": "document_count"
+      },
+      "resources.ollama_vram_bytes": {
+        "file": "results/runwitness-phi35-text-v020-runwitness-summary.json",
+        "path": "resources.ollama_vram_bytes"
+      }
+    }
+  },
+  "deployment": {
+    "name": "local-ollama-evaluation",
+    "policy": {
+      "name": "docubench-starter-smoke-v0.2",
+      "status": "example-not-production",
+      "rationale": "Exercises integration behavior; thresholds are not production recommendations."
+    },
+    "timeout_seconds": 7200,
+    "network": {"mode": "local-service-not-enforced"},
+    "gates": [
+      {"metric": "quality.aggregate", "op": "exists"},
+      {"metric": "quality.document_count", "op": "==", "value": 3},
+      {"metric": "runtime.exit_code", "op": "==", "value": 0}
+    ]
+  }
+}

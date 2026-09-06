@@ -37,7 +37,7 @@ from DocuBench's existing 72-document corpus. Both immutable evidence bundles
 passed their smoke policy and artifact-integrity verification. This is not a
 replacement for the full benchmark and not a production threshold.
 
-![RunWitness v0.2 case-study evidence](docs/assets/case-study-v020.svg)
+![RunWitness v0.2 case-study evidence](docs/assets/case-study-v020.png)
 
 The variation is the point: an aggregate alone hides that Ministral-3 reached
 92.21% on a PDF table but only 13.64% on a Hebrew RTL invoice. The Phi track used
@@ -144,7 +144,8 @@ python3 -m unittest discover -s tests -v
 python3 -m pip wheel . --no-deps --wheel-dir dist
 ```
 
-See the [changelog](CHANGELOG.md) for release history.
+See the [contribution guide](CONTRIBUTING.md), [v0.3 roadmap](ROADMAP.md), and
+[changelog](CHANGELOG.md) for project direction and release history.
 
 ## License and benchmark boundaries
 

@@ -160,6 +160,10 @@ Milestone 1 includes an experimental, fully offline
 sanitized fixtures, explicit `pass`/`fail`/`unknown`/`invalid` outcomes, and no AWS
 credentials or infrastructure requirement.
 
+Saved, sanitized AWS CLI/SDK responses can also be transformed with the
+[offline AWS import workflow](docs/aws-offline-import.md). The importer copies and
+hashes every source artifact and does not access AWS or ambient credentials.
+
 ## License and benchmark boundaries
 
 RunWitness is MIT licensed. External benchmarks and datasets retain their own

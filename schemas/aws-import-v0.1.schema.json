@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://runwitness.dev/schemas/aws-import-v0.1.schema.json",
+  "title": "RunWitness saved AWS response import v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "evidence_id", "profile", "scope", "evaluation_window", "inputs"],
+  "properties": {
+    "schema_version": {"const": "runwitness.aws-import/v0.1"},
+    "evidence_id": {"type": "string", "minLength": 3},
+    "profile": {"type": "object"},
+    "scope": {"type": "object"},
+    "evaluation_window": {"type": "object"},
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ec2", "routes", "endpoints", "security_groups", "network_acls", "volumes", "s3_public_access_block", "logging_observation", "artifacts"],
+      "properties": {
+        "ec2": {"$ref": "#/$defs/input"},
+        "routes": {"$ref": "#/$defs/input"},
+        "endpoints": {"$ref": "#/$defs/input"},
+        "security_groups": {"$ref": "#/$defs/input"},
+        "network_acls": {"$ref": "#/$defs/input"},
+        "volumes": {"$ref": "#/$defs/input"},
+        "s3_public_access_block": {"$ref": "#/$defs/input"},
+        "logging_observation": {"$ref": "#/$defs/input"},
+        "artifacts": {"$ref": "#/$defs/input"}
+      }
+    }
+  },
+  "$defs": {
+    "input": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["status", "path", "captured_at"],
+          "properties": {"status": {"const": "observed"}, "path": {"type": "string", "minLength": 1}, "captured_at": {"type": "string", "format": "date-time"}}
+        },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["status", "reason"],
+          "properties": {"status": {"enum": ["unavailable", "permission_denied"]}, "reason": {"type": "string", "minLength": 1}}
+        }
+      ]
+    }
+  }
+}

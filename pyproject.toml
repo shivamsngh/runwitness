@@ -27,4 +27,4 @@ runwitness = "runwitness.cli:main"
 where = ["src"]
 
 [tool.setuptools.data-files]
-"share/runwitness/schemas" = ["schemas/aws-evidence-v0.1.schema.json"]
+"share/runwitness/schemas" = ["schemas/aws-evidence-v0.1.schema.json", "schemas/aws-import-v0.1.schema.json"]

@@ -8,6 +8,7 @@ from .config import ConfigError, load_config
 from .bundle import compare_bundles, verify_bundle
 from .runner import run
 from .aws_evidence import AwsEvidenceError, evaluate_aws_evidence_file
+from .aws_import import import_aws_capture, verify_aws_import_bundle
 
 
 def parser():
@@ -27,6 +28,11 @@ def parser():
     aws_evaluate = commands.add_parser("aws-evaluate", help="evaluate a caller-supplied AWS evidence document offline")
     aws_evaluate.add_argument("evidence")
     aws_evaluate.add_argument("--output")
+    aws_import = commands.add_parser("aws-import", help="import saved AWS responses without network access")
+    aws_import.add_argument("capture")
+    aws_import.add_argument("--output", required=True)
+    aws_import_verify = commands.add_parser("aws-import-verify", help="verify hashes in an imported AWS evidence bundle")
+    aws_import_verify.add_argument("bundle")
     return root
 
 
@@ -46,6 +52,14 @@ def main(argv=None):
             if args.output:
                 Path(args.output).write_text(rendered + "\n", encoding="utf-8")
             print(rendered)
+            return 0 if result["overall"] == "pass" else 2
+        if args.command == "aws-import":
+            bundle, decision = import_aws_capture(args.capture, args.output)
+            print(json.dumps({"bundle": str(bundle), "decision": decision["overall"]}, indent=2, sort_keys=True))
+            return 0 if decision["overall"] == "pass" else 2
+        if args.command == "aws-import-verify":
+            result = verify_aws_import_bundle(args.bundle)
+            print(json.dumps(result, indent=2, sort_keys=True))
             return 0 if result["overall"] == "pass" else 2
         config, source = load_config(args.config)
         if args.command == "validate":

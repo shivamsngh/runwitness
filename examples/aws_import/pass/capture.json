@@ -1,0 +1,18 @@
+{
+  "schema_version": "runwitness.aws-import/v0.1",
+  "evidence_id": "aws-import-pass-001",
+  "profile": {"id": "aws-restricted-egress/v0.1", "network_variant": "strict", "max_evidence_age_seconds": 900, "allowed_endpoint_services": []},
+  "scope": {"account_ref": "sanitized:account-a", "region": "us-east-1", "instance_ref": "sanitized:instance-a", "subnet_ref": "sanitized:subnet-a"},
+  "evaluation_window": {"start": "2026-01-15T10:00:00Z", "end": "2026-01-15T10:10:00Z"},
+  "inputs": {
+    "ec2": {"status": "observed", "path": "raw/describe-instances.json", "captured_at": "2026-01-15T10:09:00Z"},
+    "routes": {"status": "observed", "path": "raw/describe-route-tables.json", "captured_at": "2026-01-15T10:09:00Z"},
+    "endpoints": {"status": "observed", "path": "raw/describe-vpc-endpoints.json", "captured_at": "2026-01-15T10:09:00Z"},
+    "security_groups": {"status": "observed", "path": "raw/describe-security-groups.json", "captured_at": "2026-01-15T10:09:00Z"},
+    "network_acls": {"status": "observed", "path": "raw/describe-network-acls.json", "captured_at": "2026-01-15T10:09:00Z"},
+    "volumes": {"status": "observed", "path": "raw/describe-volumes.json", "captured_at": "2026-01-15T10:09:00Z"},
+    "s3_public_access_block": {"status": "observed", "path": "raw/get-public-access-block.json", "captured_at": "2026-01-15T10:09:00Z"},
+    "logging_observation": {"status": "observed", "path": "raw/logging-observation.json", "captured_at": "2026-01-15T10:09:00Z"},
+    "artifacts": {"status": "observed", "path": "raw/artifacts.json", "captured_at": "2026-01-15T10:09:00Z"}
+  }
+}

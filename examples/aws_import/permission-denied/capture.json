@@ -1,0 +1,18 @@
+{
+  "schema_version": "runwitness.aws-import/v0.1",
+  "evidence_id": "aws-import-permission-001",
+  "profile": {"id": "aws-restricted-egress/v0.1", "network_variant": "strict", "max_evidence_age_seconds": 900, "allowed_endpoint_services": []},
+  "scope": {"account_ref": "sanitized:account-a", "region": "us-east-1", "instance_ref": "sanitized:instance-a", "subnet_ref": "sanitized:subnet-a"},
+  "evaluation_window": {"start": "2026-01-15T10:00:00Z", "end": "2026-01-15T10:10:00Z"},
+  "inputs": {
+    "ec2": {"status": "permission_denied", "reason": "fixture simulates denied EC2 read"},
+    "routes": {"status": "permission_denied", "reason": "fixture simulates denied route-table read"},
+    "endpoints": {"status": "unavailable", "reason": "fixture omits endpoint evidence"},
+    "security_groups": {"status": "unavailable", "reason": "fixture omits security-group evidence"},
+    "network_acls": {"status": "unavailable", "reason": "fixture omits network-ACL evidence"},
+    "volumes": {"status": "unavailable", "reason": "fixture omits volume evidence"},
+    "s3_public_access_block": {"status": "unavailable", "reason": "fixture omits S3 evidence"},
+    "logging_observation": {"status": "unavailable", "reason": "fixture omits delivery observations"},
+    "artifacts": {"status": "unavailable", "reason": "fixture omits artifact evidence"}
+  }
+}

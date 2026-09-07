@@ -1,0 +1,1 @@
+{"NetworkAcls":[{"NetworkAclId":"sanitized:network-acl-a","Entries":[{"Egress":true,"RuleAction":"deny","RuleNumber":32767}]}]}

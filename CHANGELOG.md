@@ -6,6 +6,8 @@
   `runwitness aws-evaluate` policy evaluator.
 - Add sanitized pass, fail, unavailable, permission-denied, and stale AWS evidence
   fixtures with traceable four-state decisions.
+- Add an import-only AWS collector for saved CLI/SDK responses, with path
+  containment, raw-source preservation, source hashes, and no AWS dependency.
 
 ## 0.2.1 — 2026-09-06
 

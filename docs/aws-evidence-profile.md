@@ -50,3 +50,7 @@ collector, query AWS, prove that the evidence set is complete, observe guest
 traffic, or certify an air gap. Configuration, logs, negative probes, and runtime
 observations need to be combined in a future executed reference case. The output
 applies only to the declared scope and evaluation window.
+
+Saved AWS CLI or SDK responses can be normalized through the
+[offline import workflow](aws-offline-import.md). Import and live collection remain
+separate trust boundaries.

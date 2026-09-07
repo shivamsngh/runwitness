@@ -1,0 +1,1 @@
+{"RouteTables":[{"RouteTableId":"sanitized:route-table-a","Routes":[{"DestinationCidrBlock":"sanitized:vpc-cidr","GatewayId":"local","State":"active"}]}]}

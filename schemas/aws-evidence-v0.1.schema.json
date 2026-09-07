@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://runwitness.dev/schemas/aws-evidence-v0.1.schema.json",
+  "title": "RunWitness AWS evidence profile v0.1",
+  "description": "Caller-supplied, offline-reviewable AWS deployment evidence. Presence in this document is not proof of collection completeness or authenticity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "evidence_id", "profile", "scope", "evaluation_window", "sources"],
+  "properties": {
+    "schema_version": {"const": "runwitness.aws-evidence/v0.1"},
+    "evidence_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "network_variant", "max_evidence_age_seconds", "allowed_endpoint_services"],
+      "properties": {
+        "id": {"const": "aws-restricted-egress/v0.1"},
+        "network_variant": {"enum": ["strict", "restricted_egress"]},
+        "max_evidence_age_seconds": {"type": "integer", "minimum": 0},
+        "allowed_endpoint_services": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      },
+      "allOf": [{"if": {"properties": {"network_variant": {"const": "strict"}}}, "then": {"properties": {"allowed_endpoint_services": {"maxItems": 0}}}}]
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["account_ref", "region", "instance_ref", "subnet_ref"],
+      "properties": {
+        "account_ref": {"type": "string", "minLength": 1},
+        "region": {"type": "string"},
+        "instance_ref": {"type": "string", "minLength": 1},
+        "subnet_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "evaluation_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {"start": {"type": "string", "format": "date-time"}, "end": {"type": "string", "format": "date-time"}}
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ec2", "routes", "endpoints", "packet_controls", "storage", "logging", "artifacts"],
+      "properties": {
+        "ec2": {"$ref": "#/$defs/ec2Source"},
+        "routes": {"$ref": "#/$defs/routesSource"},
+        "endpoints": {"$ref": "#/$defs/endpointsSource"},
+        "packet_controls": {"$ref": "#/$defs/packetControlsSource"},
+        "storage": {"$ref": "#/$defs/storageSource"},
+        "logging": {"$ref": "#/$defs/loggingSource"},
+        "artifacts": {"$ref": "#/$defs/artifactsSource"}
+      }
+    }
+  },
+  "$defs": {
+    "unavailableSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {"status": {"enum": ["unavailable", "permission_denied"]}, "reason": {"type": "string", "minLength": 1}}
+    },
+    "ec2Source": {
+      "oneOf": [
+        {"$ref": "#/$defs/unavailableSource"},
+        {"$ref": "#/$defs/observedEc2"}
+      ]
+    },
+    "routesSource": {
+      "oneOf": [
+        {"$ref": "#/$defs/unavailableSource"},
+        {"$ref": "#/$defs/observedRoutes"}
+      ]
+    },
+    "endpointsSource": {
+      "oneOf": [
+        {"$ref": "#/$defs/unavailableSource"},
+        {"$ref": "#/$defs/observedEndpoints"}
+      ]
+    },
+    "packetControlsSource": {
+      "oneOf": [
+        {"$ref": "#/$defs/unavailableSource"},
+        {"$ref": "#/$defs/observedPacketControls"}
+      ]
+    },
+    "storageSource": {
+      "oneOf": [
+        {"$ref": "#/$defs/unavailableSource"},
+        {"$ref": "#/$defs/observedStorage"}
+      ]
+    },
+    "loggingSource": {
+      "oneOf": [
+        {"$ref": "#/$defs/unavailableSource"},
+        {"$ref": "#/$defs/observedLogging"}
+      ]
+    },
+    "artifactsSource": {
+      "oneOf": [
+        {"$ref": "#/$defs/unavailableSource"},
+        {"$ref": "#/$defs/observedArtifacts"}
+      ]
+    },
+    "observedEc2": {
+      "type": "object", "additionalProperties": false, "required": ["status", "captured_at", "data"],
+      "properties": {
+        "status": {"const": "observed"}, "captured_at": {"type": "string", "format": "date-time"}, "collector": {"type": "string"},
+        "data": {"type": "object", "additionalProperties": false, "required": ["public_ipv4", "ipv6_addresses"], "properties": {"public_ipv4": {"type": ["string", "null"]}, "ipv6_addresses": {"type": "array", "items": {"type": "string"}}}}
+      }
+    },
+    "observedRoutes": {
+      "type": "object", "additionalProperties": false, "required": ["status", "captured_at", "data"],
+      "properties": {
+        "status": {"const": "observed"}, "captured_at": {"type": "string", "format": "date-time"}, "collector": {"type": "string"},
+        "data": {"type": "object", "additionalProperties": false, "required": ["entries"], "properties": {"entries": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["destination", "target_type", "state"], "properties": {"destination": {"type": "string"}, "target_type": {"enum": ["local", "internet_gateway", "nat_gateway", "egress_only_internet_gateway", "transit_gateway", "vpc_peering", "vpn", "direct_connect", "network_interface", "other"]}, "state": {"enum": ["active", "blackhole"]}}}}}}
+      }
+    },
+    "observedEndpoints": {
+      "type": "object", "additionalProperties": false, "required": ["status", "captured_at", "data"],
+      "properties": {"status": {"const": "observed"}, "captured_at": {"type": "string", "format": "date-time"}, "collector": {"type": "string"}, "data": {"type": "object", "additionalProperties": false, "required": ["service_names"], "properties": {"service_names": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}}}}
+    },
+    "observedPacketControls": {
+      "type": "object", "additionalProperties": false, "required": ["status", "captured_at", "data"],
+      "properties": {"status": {"const": "observed"}, "captured_at": {"type": "string", "format": "date-time"}, "collector": {"type": "string"}, "data": {"type": "object", "additionalProperties": false, "required": ["security_group_egress_closed", "network_acl_egress_closed"], "properties": {"security_group_egress_closed": {"type": "boolean"}, "network_acl_egress_closed": {"type": "boolean"}}}}
+    },
+    "observedStorage": {
+      "type": "object", "additionalProperties": false, "required": ["status", "captured_at", "data"],
+      "properties": {"status": {"const": "observed"}, "captured_at": {"type": "string", "format": "date-time"}, "collector": {"type": "string"}, "data": {"type": "object", "additionalProperties": false, "required": ["encrypted", "customer_managed_key", "s3_public_access_block"], "properties": {"encrypted": {"type": "boolean"}, "customer_managed_key": {"type": "boolean"}, "s3_public_access_block": {"type": "boolean"}}}}
+    },
+    "observedLogging": {
+      "type": "object", "additionalProperties": false, "required": ["status", "captured_at", "data"],
+      "properties": {"status": {"const": "observed"}, "captured_at": {"type": "string", "format": "date-time"}, "collector": {"type": "string"}, "data": {"type": "object", "additionalProperties": false, "required": ["cloudtrail_delivered", "flow_logs_delivered", "flow_logs_skipped_records"], "properties": {"cloudtrail_delivered": {"type": "boolean"}, "flow_logs_delivered": {"type": "boolean"}, "flow_logs_skipped_records": {"type": "integer", "minimum": 0}}}}
+    },
+    "observedArtifacts": {
+      "type": "object", "additionalProperties": false, "required": ["status", "captured_at", "data"],
+      "properties": {"status": {"const": "observed"}, "captured_at": {"type": "string", "format": "date-time"}, "collector": {"type": "string"}, "data": {"type": "object", "additionalProperties": false, "required": ["expected_digests", "observed_digests"], "properties": {"expected_digests": {"$ref": "#/$defs/digests"}, "observed_digests": {"$ref": "#/$defs/digests"}}}}
+    },
+    "digests": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^sha256:"}
+    }
+  }
+}

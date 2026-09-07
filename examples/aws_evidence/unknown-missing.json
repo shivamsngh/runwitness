@@ -1,0 +1,16 @@
+{
+  "schema_version": "runwitness.aws-evidence/v0.1",
+  "evidence_id": "aws-unknown-missing-001",
+  "profile": {"id": "aws-restricted-egress/v0.1", "network_variant": "strict", "max_evidence_age_seconds": 900, "allowed_endpoint_services": []},
+  "scope": {"account_ref": "sanitized:account-a", "region": "us-east-1", "instance_ref": "sanitized:instance-a", "subnet_ref": "sanitized:subnet-a"},
+  "evaluation_window": {"start": "2026-01-15T10:00:00Z", "end": "2026-01-15T10:10:00Z"},
+  "sources": {
+    "ec2": {"status": "observed", "captured_at": "2026-01-15T10:09:00Z", "data": {"public_ipv4": null, "ipv6_addresses": []}},
+    "routes": {"status": "observed", "captured_at": "2026-01-15T10:09:00Z", "data": {"entries": [{"destination": "sanitized:vpc-cidr", "target_type": "local", "state": "active"}]}},
+    "endpoints": {"status": "observed", "captured_at": "2026-01-15T10:09:00Z", "data": {"service_names": []}},
+    "packet_controls": {"status": "unavailable", "reason": "fixture simulates absent packet-control evidence"},
+    "storage": {"status": "observed", "captured_at": "2026-01-15T10:09:00Z", "data": {"encrypted": true, "customer_managed_key": true, "s3_public_access_block": true}},
+    "logging": {"status": "observed", "captured_at": "2026-01-15T10:09:00Z", "data": {"cloudtrail_delivered": true, "flow_logs_delivered": true, "flow_logs_skipped_records": 0}},
+    "artifacts": {"status": "observed", "captured_at": "2026-01-15T10:09:00Z", "data": {"expected_digests": {"model": "sha256:fixture-model"}, "observed_digests": {"model": "sha256:fixture-model"}}}
+  }
+}

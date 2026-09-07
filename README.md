@@ -155,6 +155,11 @@ The first proposed cloud assurance study is documented in the
 [AWS restricted-egress AI reference-case design](docs/AWS-REFERENCE-CASE.md). It is
 a pre-provisioning specification, not a completed evaluation or certification.
 
+Milestone 1 includes an experimental, fully offline
+[AWS evidence profile](docs/aws-evidence-profile.md) with a versioned JSON Schema,
+sanitized fixtures, explicit `pass`/`fail`/`unknown`/`invalid` outcomes, and no AWS
+credentials or infrastructure requirement.
+
 ## License and benchmark boundaries
 
 RunWitness is MIT licensed. External benchmarks and datasets retain their own

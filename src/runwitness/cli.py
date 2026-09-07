@@ -7,6 +7,7 @@ from . import __version__
 from .config import ConfigError, load_config
 from .bundle import compare_bundles, verify_bundle
 from .runner import run
+from .aws_evidence import AwsEvidenceError, evaluate_aws_evidence_file
 
 
 def parser():
@@ -23,6 +24,9 @@ def parser():
     compare = commands.add_parser("compare", help="compare metrics from two evidence bundles")
     compare.add_argument("left")
     compare.add_argument("right")
+    aws_evaluate = commands.add_parser("aws-evaluate", help="evaluate a caller-supplied AWS evidence document offline")
+    aws_evaluate.add_argument("evidence")
+    aws_evaluate.add_argument("--output")
     return root
 
 
@@ -36,6 +40,13 @@ def main(argv=None):
         if args.command == "compare":
             print(json.dumps(compare_bundles(args.left, args.right), indent=2, sort_keys=True))
             return 0
+        if args.command == "aws-evaluate":
+            result = evaluate_aws_evidence_file(args.evidence)
+            rendered = json.dumps(result, indent=2, sort_keys=True)
+            if args.output:
+                Path(args.output).write_text(rendered + "\n", encoding="utf-8")
+            print(rendered)
+            return 0 if result["overall"] == "pass" else 2
         config, source = load_config(args.config)
         if args.command == "validate":
             print(json.dumps({"valid": True, "benchmark": config["benchmark"]["name"]}))
@@ -43,6 +54,6 @@ def main(argv=None):
         bundle, decision = run(config, source, Path(args.output))
         print(json.dumps({"bundle": str(bundle), "decision": decision["overall"]}))
         return 0 if decision["overall"] == "pass" else 2
-    except (ConfigError, OSError, ValueError) as exc:
+    except (AwsEvidenceError, ConfigError, OSError, ValueError) as exc:
         print(f"runwitness: {exc}", file=sys.stderr)
         return 1

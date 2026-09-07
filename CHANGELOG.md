@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Add the experimental `runwitness.aws-evidence/v0.1` JSON Schema and offline
+  `runwitness aws-evaluate` policy evaluator.
+- Add sanitized pass, fail, unavailable, permission-denied, and stale AWS evidence
+  fixtures with traceable four-state decisions.
+
 ## 0.2.1 — 2026-09-06
 
 - Add reproducible Ministral-3 vision and Phi 3.5 text DocuBench case-study manifests and an evidence-bounded report.

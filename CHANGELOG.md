@@ -8,6 +8,9 @@
   fixtures with traceable four-state decisions.
 - Add an import-only AWS collector for saved CLI/SDK responses, with path
   containment, raw-source preservation, source hashes, and no AWS dependency.
+- Add a three-phase, disposable AWS L40S Terraform reference environment with
+  account guards, frozen inputs, restricted transfer paths, runtime isolation,
+  evidence logging, a compute watchdog, and protected teardown semantics.
 
 ## 0.2.1 — 2026-09-06
 

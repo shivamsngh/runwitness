@@ -327,7 +327,8 @@ mod tests {
     #[test]
     fn records_a_launched_process_without_arguments() {
         let child = Command::new("sh")
-            .args(["-c", "sleep 0.05"])
+            // Leave enough time for a loaded CI runner to observe RSS before exit.
+            .args(["-c", "sleep 0.5"])
             .spawn()
             .expect("test process should launch");
         let options = Options {

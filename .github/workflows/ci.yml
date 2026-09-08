@@ -76,3 +76,18 @@ jobs:
           PY
       - run: cargo test --manifest-path collector/Cargo.toml
       - run: cargo publish --manifest-path collector/Cargo.toml --dry-run
+
+  terraform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: infra/aws/reference-case
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false
+      - run: terraform validate

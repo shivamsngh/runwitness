@@ -5,5 +5,10 @@ dist/
 build/
 *.egg-info/
 runs/
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+tfplan
 native-results.json
 collector/target/

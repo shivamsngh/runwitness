@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+
+case_root=/var/lib/runwitness
+input_dir="$${case_root}/inputs"
+evidence_dir="$${case_root}/evidence"
+mkdir -p "$${input_dir}" "$${evidence_dir}"
+
+# Independent cost backstop. The instance stops even if orchestration fails.
+(sleep $(( ${max_instance_minutes} * 60 )); shutdown -h now) &
+
+token=$(curl --fail --silent --show-error --max-time 2 -X PUT \
+  -H 'X-aws-ec2-metadata-token-ttl-seconds: 21600' \
+  http://169.254.169.254/latest/api/token)
+
+phase() {
+  curl --fail --silent --show-error --max-time 2 \
+    -H "X-aws-ec2-metadata-token: $${token}" \
+    http://169.254.169.254/latest/meta-data/tags/instance/RunWitnessPhase
+}
+
+aws s3 cp "s3://${bucket}/${runner_bundle_key}" "$${input_dir}/runner.tar.gz" --no-progress
+aws s3 cp "s3://${bucket}/${model_bundle_key}" "$${input_dir}/model.bundle" --no-progress
+echo '${runner_bundle_sha256}  '"$${input_dir}/runner.tar.gz" | sha256sum --check --status
+echo '${model_bundle_sha256}  '"$${input_dir}/model.bundle" | sha256sum --check --status
+mkdir -p /opt/runwitness
+tar --extract --gzip --file "$${input_dir}/runner.tar.gz" --directory /opt/runwitness
+test -x /opt/runwitness/run.sh
+
+printf '{"case_id":"%s","state":"ready"}\n' '${case_id}' > "$${case_root}/ready.json"
+aws s3 cp "$${case_root}/ready.json" "s3://${bucket}/${evidence_key}/status/ready.json" --no-progress
+
+until [[ "$(phase)" == "evaluation" ]]; do sleep 3; done
+
+date --utc +%Y-%m-%dT%H:%M:%SZ > "$${evidence_dir}/evaluation-start.txt"
+uname -a > "$${evidence_dir}/uname.txt"
+nvidia-smi --query-gpu=uuid,name,driver_version,memory.total --format=csv,noheader > "$${evidence_dir}/gpu.csv" 2>&1 || true
+ip -json address > "$${evidence_dir}/ip-address.json" 2>&1 || true
+ip -json route > "$${evidence_dir}/ip-route.json" 2>&1 || true
+ss --numeric --all --processes > "$${evidence_dir}/sockets.txt" 2>&1 || true
+
+set +e
+curl --silent --show-error --connect-timeout 3 --max-time 5 https://example.com/ > /dev/null 2> "$${evidence_dir}/forbidden-https-probe.txt"
+printf '%s\n' "$?" > "$${evidence_dir}/forbidden-https-probe.exit"
+timeout 25m /opt/runwitness/run.sh "$${input_dir}/model.bundle" "$${evidence_dir}" > "$${evidence_dir}/runner.stdout" 2> "$${evidence_dir}/runner.stderr"
+runner_status=$?
+set -e
+
+printf '%s\n' "$${runner_status}" > "$${evidence_dir}/runner.exit"
+date --utc +%Y-%m-%dT%H:%M:%SZ > "$${evidence_dir}/evaluation-end.txt"
+find "$${evidence_dir}" -type f -print0 | sort -z | xargs -0 sha256sum > "$${evidence_dir}/SHA256SUMS"
+
+# The evidence remains local until Terraform restores the bounded S3 path.
+for _ in $(seq 1 200); do
+  [[ "$(phase)" == "export" ]] && break
+  sleep 3
+done
+
+if [[ "$(phase)" == "export" ]]; then
+  aws s3 cp "$${evidence_dir}" "s3://${bucket}/${evidence_key}/run/" --recursive --no-progress
+  printf '{"case_id":"%s","state":"exported","runner_exit":%s}\n' '${case_id}' "$${runner_status}" > "$${case_root}/exported.json"
+  aws s3 cp "$${case_root}/exported.json" "s3://${bucket}/${evidence_key}/status/exported.json" --no-progress
+fi
+
+shutdown -h now

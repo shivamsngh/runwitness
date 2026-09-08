@@ -164,6 +164,12 @@ Saved, sanitized AWS CLI/SDK responses can also be transformed with the
 [offline AWS import workflow](docs/aws-offline-import.md). The importer copies and
 hashes every source artifact and does not access AWS or ambient credentials.
 
+The proposed live experiment now has a dedicated
+[three-phase Terraform design](infra/aws/reference-case/README.md). It is source
+code only: the project has not applied it or created AWS resources. Preparation,
+isolated evaluation, evidence export, and destructive teardown require separate
+reviewed actions.
+
 ## License and benchmark boundaries
 
 RunWitness is MIT licensed. External benchmarks and datasets retain their own
